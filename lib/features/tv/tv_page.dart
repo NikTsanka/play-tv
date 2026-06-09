@@ -32,6 +32,7 @@ class _TvPageState extends ConsumerState<TvPage> {
   bool _panelCollapsed = false;
   bool _osdVisible = false;
   Timer? _osdTimer;
+  double _dragAccum = 0;
   final FocusNode _focus = FocusNode(debugLabel: 'tv-zapping');
 
   @override
@@ -252,21 +253,30 @@ class _TvPageState extends ConsumerState<TvPage> {
                       },
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
-                        // Drag up → next channel, drag down → previous.
-                        onVerticalDragEnd: (DragEndDetails d) {
-                          final double v = d.primaryVelocity ?? 0;
+                        // Distance-based vertical drag → switch channels (works
+                        // for slow drags, not just flicks). Up = next, down = prev.
+                        onVerticalDragStart: (_) => _dragAccum = 0,
+                        onVerticalDragUpdate: (DragUpdateDetails d) {
+                          _dragAccum += d.delta.dy;
+                          const double step = 48;
                           final zapper = ref.read(zappingProvider.notifier);
-                          if (v < -100) {
+                          if (_dragAccum <= -step) {
+                            _dragAccum = 0;
                             zapper.next();
-                          } else if (v > 100) {
+                          } else if (_dragAccum >= step) {
+                            _dragAccum = 0;
                             zapper.previousChannel();
                           }
                         },
-                        child: _VideoArea(
-                          current: zap.current,
-                          numberEntry: zap.numberEntry,
-                          osdVisible: _osdVisible,
-                          onFullscreen: _enterFullscreen,
+                        // Controls must not grab keyboard focus, or the volume
+                        // slider would eat the arrow keys (esp. after fullscreen).
+                        child: ExcludeFocus(
+                          child: _VideoArea(
+                            current: zap.current,
+                            numberEntry: zap.numberEntry,
+                            osdVisible: _osdVisible,
+                            onFullscreen: _enterFullscreen,
+                          ),
                         ),
                       ),
                     )
