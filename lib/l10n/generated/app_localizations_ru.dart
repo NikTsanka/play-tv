@@ -184,6 +184,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get osdNoGuide => 'Нет данных программы';
 
   @override
+  String get playlistDelete => 'Удалить плейлист';
+
+  @override
+  String playlistDeleteConfirm(String name) {
+    return 'Удалить \"$name\" и все его каналы?';
+  }
+
+  @override
+  String get channelFavorite => 'В избранное';
+
+  @override
+  String get channelUnfavorite => 'Убрать из избранного';
+
+  @override
   String get commonBack => 'Назад';
 
   @override

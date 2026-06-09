@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,8 @@ import '../../domain/channels/channel.dart';
 import '../../domain/channels/channels_providers.dart';
 import '../../domain/channels/zapping_controller.dart';
 import '../../domain/epg/epg_providers.dart';
+import '../../domain/playback/playback_providers.dart';
+import '../../domain/providers/providers_providers.dart';
 import '../../domain/recording/recording_providers.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../player/widgets/player_surface.dart';
@@ -45,6 +48,14 @@ class _TvPageState extends ConsumerState<TvPage> {
     });
   }
 
+  /// Adjusts volume by [delta] (0..100 scale) and flashes the OSD.
+  void _changeVolume(double delta) {
+    final engine = ref.read(playbackEngineProvider);
+    final double current = ref.read(currentStatusProvider).volume;
+    engine.setVolume((current + delta).clamp(0.0, 100.0));
+    _showOsd();
+  }
+
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final zap = ref.read(zappingProvider.notifier);
@@ -56,6 +67,14 @@ class _TvPageState extends ConsumerState<TvPage> {
     }
     if (key == LogicalKeyboardKey.arrowDown) {
       zap.previousChannel();
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowRight) {
+      _changeVolume(5);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowLeft) {
+      _changeVolume(-5);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.enter ||
@@ -77,6 +96,33 @@ class _TvPageState extends ConsumerState<TvPage> {
 
   Future<void> _import() async {
     await showAddProviderDialog(context);
+  }
+
+  Future<void> _deletePlaylist() async {
+    final l10n = AppLocalizations.of(context);
+    final int? id = ref.read(currentPlaylistProvider);
+    if (id == null) return;
+    String name = '';
+    for (final p in ref.read(playlistsProvider).valueOrNull ?? const []) {
+      if (p.id == id) name = p.name;
+    }
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.playlistDelete),
+        content: Text(l10n.playlistDeleteConfirm(name)),
+        actions: <Widget>[
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l10n.commonCancel)),
+          FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l10n.commonDelete)),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await ref.read(providersManagerProvider).delete(id);
   }
 
   Future<void> _recordCurrent() async {
@@ -143,6 +189,12 @@ class _TvPageState extends ConsumerState<TvPage> {
           actions: <Widget>[
             const _PlaylistSelector(),
             IconButton(
+              tooltip: l10n.playlistDelete,
+              icon: const Icon(Icons.playlist_remove),
+              onPressed:
+                  ref.watch(currentPlaylistProvider) == null ? null : _deletePlaylist,
+            ),
+            IconButton(
               tooltip: l10n.recRecordChannel,
               icon: const Icon(Icons.fiber_manual_record, color: Colors.red),
               onPressed: zap.current == null ? null : _recordCurrent,
@@ -171,11 +223,32 @@ class _TvPageState extends ConsumerState<TvPage> {
                   color: scheme.outlineVariant.withValues(alpha: 0.4)),
             Expanded(
               child: hasChannels || zap.current != null
-                  ? _VideoArea(
-                      current: zap.current,
-                      numberEntry: zap.numberEntry,
-                      osdVisible: _osdVisible,
-                      onFullscreen: _enterFullscreen,
+                  ? Listener(
+                      // Mouse wheel up / down → volume up / down.
+                      onPointerSignal: (PointerSignalEvent signal) {
+                        if (signal is PointerScrollEvent) {
+                          _changeVolume(signal.scrollDelta.dy < 0 ? 5 : -5);
+                        }
+                      },
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        // Drag up → next channel, drag down → previous.
+                        onVerticalDragEnd: (DragEndDetails d) {
+                          final double v = d.primaryVelocity ?? 0;
+                          final zapper = ref.read(zappingProvider.notifier);
+                          if (v < -100) {
+                            zapper.next();
+                          } else if (v > 100) {
+                            zapper.previousChannel();
+                          }
+                        },
+                        child: _VideoArea(
+                          current: zap.current,
+                          numberEntry: zap.numberEntry,
+                          osdVisible: _osdVisible,
+                          onFullscreen: _enterFullscreen,
+                        ),
+                      ),
                     )
                   : _EmptyState(onImport: _import),
             ),

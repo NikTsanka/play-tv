@@ -103,16 +103,6 @@ class AppShell extends ConsumerWidget {
                                     const Icon(Icons.fiber_manual_record),
                                 label: Text(l10n.navRecordings),
                               ),
-                              NavigationRailDestination(
-                                icon: const Icon(Icons.palette_outlined),
-                                selectedIcon: const Icon(Icons.palette),
-                                label: Text(l10n.navThemeShowcase),
-                              ),
-                              NavigationRailDestination(
-                                icon: const Icon(Icons.settings_outlined),
-                                selectedIcon: const Icon(Icons.settings),
-                                label: Text(l10n.navSettings),
-                              ),
                             ],
                           ),
                         ),

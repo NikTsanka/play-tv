@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../channels/channel.dart';
 import '../vod/vod_models.dart';
 
 /// What a favorite points at (spec §5 channels, §7 VOD).
@@ -37,6 +38,17 @@ class FavoriteItem {
 
   static String makeRefId(FavoriteKind kind, int? sourceId, String id) =>
       '${sourceId ?? 0}:${kind.id}:$id';
+
+  factory FavoriteItem.fromChannel(Channel channel, int? sourceId) =>
+      FavoriteItem(
+        refId: makeRefId(FavoriteKind.channel, sourceId, channel.id),
+        kind: FavoriteKind.channel,
+        title: channel.name,
+        sourceId: sourceId,
+        subtitle: channel.group,
+        imageUrl: channel.logoUrl,
+        playUrl: channel.url,
+      );
 
   factory FavoriteItem.fromVod(VodItem item, int sourceId) {
     final FavoriteKind kind =

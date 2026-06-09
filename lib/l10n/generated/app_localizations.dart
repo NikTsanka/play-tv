@@ -442,6 +442,30 @@ abstract class AppLocalizations {
   /// **'No guide data yet'**
   String get osdNoGuide;
 
+  /// No description provided for @playlistDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete playlist'**
+  String get playlistDelete;
+
+  /// No description provided for @playlistDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\" and all its channels?'**
+  String playlistDeleteConfirm(String name);
+
+  /// No description provided for @channelFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get channelFavorite;
+
+  /// No description provided for @channelUnfavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get channelUnfavorite;
+
   /// No description provided for @commonBack.
   ///
   /// In en, this message translates to:

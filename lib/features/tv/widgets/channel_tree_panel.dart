@@ -5,7 +5,9 @@ import '../../../domain/channels/channel.dart';
 import '../../../domain/channels/channel_tree.dart';
 import '../../../domain/channels/channels_providers.dart';
 import '../../../domain/channels/zapping_controller.dart';
+import '../../../domain/favorites/favorite_item.dart';
 import '../../../domain/parental/parental_control.dart';
+import '../../../domain/vod/vod_providers.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../settings/widgets/pin_dialog.dart';
 
@@ -49,6 +51,12 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
     final all = ref.watch(currentChannelsProvider).valueOrNull ?? const <Channel>[];
     final current = ref.watch(zappingProvider).current;
     final ParentalState parental = ref.watch(parentalControllerProvider);
+    final Set<String> favIds = ref.watch(favoriteRefIdsProvider);
+    final int? sourceId = ref.watch(currentPlaylistProvider);
+
+    String refOf(Channel c) =>
+        FavoriteItem.makeRefId(FavoriteKind.channel, sourceId, c.id);
+    bool isFav(Channel c) => favIds.contains(refOf(c));
 
     final filtered = filterChannels(all, _query);
     final groups = groupChannels(filtered, ungroupedLabel: l10n.channelsUngrouped);
@@ -56,6 +64,20 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
     // When searching, expand everything so matches are visible.
     final bool searching = _query.trim().isNotEmpty;
     final rows = <_Row>[];
+
+    // A "Favorites" pseudo-group at the top (current source's favorites).
+    final List<Channel> favChannels =
+        filtered.where(isFav).toList();
+    if (favChannels.isNotEmpty) {
+      final bool open = searching || _expanded.contains(l10n.vodFavorites);
+      rows.add(_Row.group(l10n.vodFavorites, favChannels.length, open));
+      if (open) {
+        for (final c in favChannels) {
+          rows.add(_Row.channel(c));
+        }
+      }
+    }
+
     for (final g in groups) {
       final bool open = searching || _expanded.contains(g.title);
       rows.add(_Row.group(g.title, g.channels.length, open));
@@ -117,6 +139,10 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
                   channel: c,
                   selected: current?.id == c.id,
                   locked: parental.isLocked(c),
+                  favorite: isFav(c),
+                  onFavorite: () => ref
+                      .read(vodRepositoryProvider)
+                      .toggleFavorite(FavoriteItem.fromChannel(c, sourceId)),
                   onTap: () => _playChannel(c),
                 );
               },
@@ -198,12 +224,16 @@ class _ChannelTile extends StatelessWidget {
     required this.channel,
     required this.selected,
     required this.locked,
+    required this.favorite,
+    required this.onFavorite,
     required this.onTap,
   });
 
   final Channel channel;
   final bool selected;
   final bool locked;
+  final bool favorite;
+  final VoidCallback onFavorite;
   final VoidCallback onTap;
 
   @override
@@ -241,6 +271,18 @@ class _ChannelTile extends StatelessWidget {
                 Icon(Icons.lock_outline, size: 14, color: scheme.onSurfaceVariant)
               else if (channel.hasArchive)
                 Icon(Icons.history, size: 14, color: scheme.onSurfaceVariant),
+              InkResponse(
+                radius: 18,
+                onTap: onFavorite,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  child: Icon(
+                    favorite ? Icons.star : Icons.star_border,
+                    size: 16,
+                    color: favorite ? scheme.primary : scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

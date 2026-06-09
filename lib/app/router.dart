@@ -78,23 +78,17 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: Routes.showcase,
-              builder: (context, state) => const ThemeShowcasePage(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: <RouteBase>[
-            GoRoute(
-              path: Routes.settings,
-              builder: (context, state) => const SettingsPage(),
-            ),
-          ],
-        ),
       ],
+    ),
+    // Settings & Theme showcase live outside the rail (reached from Home /
+    // top-bar), so they're pushed full-screen with a back button.
+    GoRoute(
+      path: Routes.settings,
+      builder: (context, state) => const SettingsPage(),
+    ),
+    GoRoute(
+      path: Routes.showcase,
+      builder: (context, state) => const ThemeShowcasePage(),
     ),
   ],
 );

@@ -184,6 +184,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get osdNoGuide => 'No guide data yet';
 
   @override
+  String get playlistDelete => 'Delete playlist';
+
+  @override
+  String playlistDeleteConfirm(String name) {
+    return 'Delete \"$name\" and all its channels?';
+  }
+
+  @override
+  String get channelFavorite => 'Add to favorites';
+
+  @override
+  String get channelUnfavorite => 'Remove from favorites';
+
+  @override
   String get commonBack => 'Back';
 
   @override

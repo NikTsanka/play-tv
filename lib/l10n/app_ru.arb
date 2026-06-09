@@ -64,6 +64,11 @@
   "channelsImportFile": "Из файла",
   "channelsImportFromUrl": "Импорт",
   "osdNoGuide": "Нет данных программы",
+  "playlistDelete": "Удалить плейлист",
+  "playlistDeleteConfirm": "Удалить \"{name}\" и все его каналы?",
+  "@playlistDeleteConfirm": { "placeholders": { "name": { "type": "String" } } },
+  "channelFavorite": "В избранное",
+  "channelUnfavorite": "Убрать из избранного",
 
   "navGuide": "Программа",
   "epgImportTitle": "Импорт EPG (XMLTV)",

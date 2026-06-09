@@ -184,6 +184,20 @@ class AppLocalizationsKa extends AppLocalizations {
   String get osdNoGuide => 'გიდის მონაცემები ჯერ არ არის';
 
   @override
+  String get playlistDelete => 'ფლეილისტის წაშლა';
+
+  @override
+  String playlistDeleteConfirm(String name) {
+    return 'წავშალო \"$name\" და მისი ყველა არხი?';
+  }
+
+  @override
+  String get channelFavorite => 'რჩეულებში დამატება';
+
+  @override
+  String get channelUnfavorite => 'რჩეულებიდან წაშლა';
+
+  @override
   String get commonBack => 'უკან';
 
   @override

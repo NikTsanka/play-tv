@@ -66,6 +66,11 @@
   "channelsImportFile": "From file",
   "channelsImportFromUrl": "Import",
   "osdNoGuide": "No guide data yet",
+  "playlistDelete": "Delete playlist",
+  "playlistDeleteConfirm": "Delete \"{name}\" and all its channels?",
+  "@playlistDeleteConfirm": { "placeholders": { "name": { "type": "String" } } },
+  "channelFavorite": "Add to favorites",
+  "channelUnfavorite": "Remove from favorites",
 
   "commonBack": "Back",
   "commonDelete": "Delete",

@@ -64,6 +64,11 @@
   "channelsImportFile": "ფაილიდან",
   "channelsImportFromUrl": "იმპორტი",
   "osdNoGuide": "გიდის მონაცემები ჯერ არ არის",
+  "playlistDelete": "ფლეილისტის წაშლა",
+  "playlistDeleteConfirm": "წავშალო \"{name}\" და მისი ყველა არხი?",
+  "@playlistDeleteConfirm": { "placeholders": { "name": { "type": "String" } } },
+  "channelFavorite": "რჩეულებში დამატება",
+  "channelUnfavorite": "რჩეულებიდან წაშლა",
 
   "navGuide": "გიდი",
   "epgImportTitle": "EPG-ის იმპორტი (XMLTV)",

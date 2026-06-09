@@ -35,12 +35,12 @@ class HomePage extends StatelessWidget {
                   runSpacing: 12,
                   children: <Widget>[
                     FilledButton.icon(
-                      onPressed: () => context.go(Routes.settings),
+                      onPressed: () => context.push(Routes.settings),
                       icon: const Icon(Icons.settings),
                       label: Text(l10n.homeOpenSettings),
                     ),
                     OutlinedButton.icon(
-                      onPressed: () => context.go(Routes.showcase),
+                      onPressed: () => context.push(Routes.showcase),
                       icon: const Icon(Icons.palette),
                       label: Text(l10n.homeOpenShowcase),
                     ),
