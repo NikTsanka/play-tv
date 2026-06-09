@@ -63,6 +63,10 @@ class _TvPageState extends ConsumerState<TvPage> {
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    // Only act when the TV surface itself holds focus — never hijack keys
+    // (Backspace, digits, arrows) while a text field like the channel search
+    // is focused, so typing/editing there works normally.
+    if (!_focus.hasPrimaryFocus) return KeyEventResult.ignored;
     final zap = ref.read(zappingProvider.notifier);
     final key = event.logicalKey;
 
