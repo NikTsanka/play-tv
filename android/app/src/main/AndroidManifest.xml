@@ -10,7 +10,7 @@
     <application
         android:label="StreamHub"
         android:name="${applicationName}"
-        android:banner="@mipmap/ic_launcher"
+        android:banner="@drawable/banner"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
