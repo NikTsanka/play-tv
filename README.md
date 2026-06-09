@@ -60,6 +60,14 @@ the language picker.
 
 ## Packaging
 
+- **Windows (installer, recommended):** an [Inno Setup](https://jrsoftware.org/isinfo.php)
+  script at `installer/streamhub.iss`. Build the release then compile:
+  ```
+  flutter build windows --release
+  ISCC.exe installer\streamhub.iss
+  ```
+  Produces `installer/Output/StreamHub-Setup-0.1.0.exe` — a per-user installer (no admin),
+  with Start-menu/desktop shortcuts and an uninstaller.
 - **Windows (MSIX):** config lives under `msix_config:` in `pubspec.yaml`. Build with
   `dart run msix:create` (supply a signing certificate for store/sideload distribution).
 - **Android / Android TV:** `flutter build apk` / `flutter build appbundle`. The manifest declares
