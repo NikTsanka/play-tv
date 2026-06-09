@@ -61,6 +61,9 @@ dependencies:
   # YouTube source (spec §4.6, feature-flagged): channel/playlist/video → stream.
   youtube_explode_dart: ^2.3.4
 
+  # SHA-256 for the parental-control PIN (hashed at rest).
+  crypto: ^3.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -70,6 +73,18 @@ dev_dependencies:
   drift_dev: ^2.18.0
   build_runner: ^2.4.0
 
+  # Windows store packaging (run: dart run msix:create).
+  msix: ^3.16.7
+
 flutter:
   uses-material-design: true
   generate: true
+
+# Windows MSIX packaging (spec §12). Build with `dart run msix:create`.
+msix_config:
+  display_name: StreamHub
+  publisher_display_name: StreamHub
+  identity_name: com.streamhub.app
+  msix_version: 0.1.0.0
+  capabilities: internetClient
+  install_certificate: false

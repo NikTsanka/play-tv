@@ -19,4 +19,6 @@ abstract final class PrefKeys {
   static const String currentPlaylist = 'channels.currentPlaylist';
   static const String currentVodSource = 'vod.currentSource';
   static const String recordingTemplate = 'recording.filenameTemplate';
+  static const String parentalPinHash = 'parental.pinHash';
+  static const String parentalSalt = 'parental.salt';
 }

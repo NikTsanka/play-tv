@@ -6,20 +6,22 @@ DVB/satellite tuner functionality (network streaming, OTT, VOD, local files & ra
 
 > Full functional specification: [`IPTV-Player-Flutter-Prompt.md`](IPTV-Player-Flutter-Prompt.md)
 
-## Status — Milestone 1 (Skeleton) ✅
+## Status — Milestones 1–12 ✅
 
-- Flutter app shell (Windows + Android targets) with a TV/desktop `NavigationRail`.
-- **Riverpod** state management (MVVM); **go_router** navigation.
-- **Material 3 theme** — gold (`#D4AF37` / `#E6C463`), white, near-black — with a
-  **System / Light / Dark** switch (settings + top-bar quick toggle), **persisted** and animated.
-- **Localization** scaffold (`flutter_localizations` + ARB): English, ქართული, Русский (+ RTL ready).
-- **App-data directories** (config / db / logos / recordings / cache / logs) via `path_provider`.
-- **Logging** (`logger`).
-- **Theme showcase** screen demonstrating the palette in both modes.
+- **Shell & theme** — TV/desktop `NavigationRail`, Riverpod (MVVM), go_router, Material 3
+  gold/white/black with persisted System/Light/Dark; localization (en / ka / ru).
+- **Playback** — `media_kit` engine behind a `PlaybackEngine` interface + transport controls.
+- **Channels** — M3U parser, drift storage, virtualized channel tree, zapping, OSD now/next.
+- **EPG** — streaming XMLTV import (isolate), EPG grid, alias matching, catch-up.
+- **Providers** — `Provider` / `ProviderType` / `ProvidersManager` framework: M3U URL/file,
+  Generic URL, iptv-org, **Xtream Codes**, **Stalker**, **OTT** (Kartina/Sovok/TV Club),
+  **local folder**, **YouTube** (flagged); per-zap URL resolution for session sources.
+- **VOD** — browser (movies / series / favorites), offline cache, search/sort.
+- **Recording** — HTTP recorder, scheduler (record-by-programme), filename templates, time-shift buffer.
+- **TaskManager** — cancellable background tasks with progress; logo fetch (fuzzy match); auto-update check.
+- **Parental control** — hashed PIN gating protected channels; **D-pad** focus polish; **MSIX/leanback** packaging.
 
-Upcoming milestones (see the spec, §13): playback core (`media_kit`), M3U import + channel
-tree + drift storage, EPG (XMLTV), the provider framework, Xtream Codes / Stalker / OttBase,
-VOD, recording/time-shift/scheduler, the background `TaskManager`, and full settings.
+See [`IPTV-Player-Flutter-Prompt.md`](IPTV-Player-Flutter-Prompt.md) §13 for the milestone map.
 
 ## Project layout
 
@@ -56,8 +58,25 @@ Strings are authored in `lib/l10n/app_<locale>.arb` (template: `app_en.arb`). Ru
 `flutter gen-l10n` after editing. Add a locale by dropping in a new ARB file and listing it in
 the language picker.
 
-## Adding a provider / engine
+## Packaging
 
-Documented from Milestone 5/2 onward (provider-author guide + engine guide). The contracts are
-specified in `IPTV-Player-Flutter-Prompt.md` §4 (providers) and §8 (engines), with concrete API
-references in Appendices A–D (Xtream Codes, Stalker, OttBase, M3U catch-up).
+- **Windows (MSIX):** config lives under `msix_config:` in `pubspec.yaml`. Build with
+  `dart run msix:create` (supply a signing certificate for store/sideload distribution).
+- **Android / Android TV:** `flutter build apk` / `flutter build appbundle`. The manifest declares
+  `INTERNET`, optional `leanback`/touchscreen features and a `LEANBACK_LAUNCHER` category so the
+  same artifact installs on phones and on the Android TV launcher.
+
+## Adding a provider
+
+A source is one class implementing `Provider` (`lib/domain/providers/provider.dart`) plus a
+`ProviderType` entry in the registry (`provider_type.dart`):
+
+1. Implement `fetchChannelList(sink, ct)` (push `Channel`s; set `sink.epgUrl` if you have a guide).
+2. For session/portal sources, override `resolveStreamUrl(channel)` — it's called per zap and the
+   built provider is cached so your session/token persists. Override `vodCatalog` to feed the VOD browser.
+3. Add a `ProviderType` value + a `ProviderTypeDescriptor` (capabilities + `create`).
+4. Add a setup form branch in `features/providers/add_provider_dialog.dart`.
+
+Worked examples: `sources/xtream` (deterministic URLs + VOD), `sources/stalker` (per-zap
+`create_link`), `sources/ott` (a base + branded subclasses). API references are in
+`IPTV-Player-Flutter-Prompt.md` Appendices A–D. Engines implement `PlaybackEngine` (§8).

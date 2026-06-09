@@ -1095,6 +1095,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get taskCancel;
+
+  /// No description provided for @settingsParental.
+  ///
+  /// In en, this message translates to:
+  /// **'Parental control'**
+  String get settingsParental;
+
+  /// No description provided for @settingsParentalOff.
+  ///
+  /// In en, this message translates to:
+  /// **'No PIN set — protected channels play freely'**
+  String get settingsParentalOff;
+
+  /// No description provided for @settingsParentalOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected channels require a PIN'**
+  String get settingsParentalOn;
+
+  /// No description provided for @settingsSetPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get settingsSetPin;
+
+  /// No description provided for @settingsChangePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get settingsChangePin;
+
+  /// No description provided for @settingsRemovePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN'**
+  String get settingsRemovePin;
+
+  /// No description provided for @settingsRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get settingsRecording;
+
+  /// No description provided for @settingsFilenameTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Filename template'**
+  String get settingsFilenameTemplate;
+
+  /// No description provided for @settingsCast.
+  ///
+  /// In en, this message translates to:
+  /// **'Chromecast'**
+  String get settingsCast;
+
+  /// No description provided for @settingsCastSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get settingsCastSoon;
+
+  /// No description provided for @parentalEnterPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get parentalEnterPin;
+
+  /// No description provided for @parentalNewPin.
+  ///
+  /// In en, this message translates to:
+  /// **'New PIN'**
+  String get parentalNewPin;
+
+  /// No description provided for @parentalCurrentPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Current PIN'**
+  String get parentalCurrentPin;
+
+  /// No description provided for @parentalWrongPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN'**
+  String get parentalWrongPin;
+
+  /// No description provided for @parentalLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This channel is locked'**
+  String get parentalLocked;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get commonOk;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get commonSave;
 }
 
 class _AppLocalizationsDelegate

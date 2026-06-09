@@ -185,5 +185,23 @@
   "settingsUpdateAvailable": "Update available: {version}",
   "@settingsUpdateAvailable": { "placeholders": { "version": { "type": "String" } } },
   "settingsUpdateFailed": "Update check failed",
-  "taskCancel": "Cancel"
+  "taskCancel": "Cancel",
+
+  "settingsParental": "Parental control",
+  "settingsParentalOff": "No PIN set — protected channels play freely",
+  "settingsParentalOn": "Protected channels require a PIN",
+  "settingsSetPin": "Set PIN",
+  "settingsChangePin": "Change PIN",
+  "settingsRemovePin": "Remove PIN",
+  "settingsRecording": "Recording",
+  "settingsFilenameTemplate": "Filename template",
+  "settingsCast": "Chromecast",
+  "settingsCastSoon": "Coming soon",
+  "parentalEnterPin": "Enter PIN",
+  "parentalNewPin": "New PIN",
+  "parentalCurrentPin": "Current PIN",
+  "parentalWrongPin": "Wrong PIN",
+  "parentalLocked": "This channel is locked",
+  "commonOk": "OK",
+  "commonSave": "Save"
 }

@@ -1,7 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Network playback (IPTV / VOD / EPG downloads). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Android TV (leanback): runnable on TVs without touch; declared optional
+         so the same APK also installs on phones/tablets. -->
+    <uses-feature android:name="android.software.leanback" android:required="false"/>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
+
     <application
-        android:label="streamhub"
+        android:label="StreamHub"
         android:name="${applicationName}"
+        android:banner="@mipmap/ic_launcher"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -23,6 +32,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <!-- Surface the app in the Android TV launcher. -->
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

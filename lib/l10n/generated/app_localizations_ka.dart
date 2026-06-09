@@ -527,4 +527,56 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get taskCancel => 'გაუქმება';
+
+  @override
+  String get settingsParental => 'მშობლის კონტროლი';
+
+  @override
+  String get settingsParentalOff =>
+      'PIN არ არის — დაცული არხები თავისუფლად იკვრება';
+
+  @override
+  String get settingsParentalOn => 'დაცული არხები PIN-ს ითხოვს';
+
+  @override
+  String get settingsSetPin => 'PIN-ის დაყენება';
+
+  @override
+  String get settingsChangePin => 'PIN-ის შეცვლა';
+
+  @override
+  String get settingsRemovePin => 'PIN-ის წაშლა';
+
+  @override
+  String get settingsRecording => 'ჩაწერა';
+
+  @override
+  String get settingsFilenameTemplate => 'ფაილის სახელის შაბლონი';
+
+  @override
+  String get settingsCast => 'Chromecast';
+
+  @override
+  String get settingsCastSoon => 'მალე';
+
+  @override
+  String get parentalEnterPin => 'შეიყვანეთ PIN';
+
+  @override
+  String get parentalNewPin => 'ახალი PIN';
+
+  @override
+  String get parentalCurrentPin => 'მიმდინარე PIN';
+
+  @override
+  String get parentalWrongPin => 'არასწორი PIN';
+
+  @override
+  String get parentalLocked => 'ეს არხი დაბლოკილია';
+
+  @override
+  String get commonOk => 'კარგი';
+
+  @override
+  String get commonSave => 'შენახვა';
 }

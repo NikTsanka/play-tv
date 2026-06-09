@@ -134,7 +134,9 @@ class AppShell extends ConsumerWidget {
             ),
           ),
           const VerticalDivider(width: 1),
-          Expanded(child: navigationShell),
+          // Group page-content focus so D-pad traversal stays within the active
+          // page and doesn't jump back to the rail unexpectedly (spec §9).
+          Expanded(child: FocusTraversalGroup(child: navigationShell)),
         ],
       ),
     );

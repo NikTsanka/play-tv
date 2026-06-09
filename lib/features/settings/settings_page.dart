@@ -4,10 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/locale_controller.dart';
 import '../../app/theme/theme_controller.dart';
 import '../../core/app_info.dart';
+import '../../core/feature_flags.dart';
+import '../../core/storage/preferences.dart';
 import '../../domain/logos/logo_service.dart';
+import '../../domain/parental/parental_control.dart';
+import '../../domain/recording/recording_providers.dart';
 import '../../domain/tasks/task_manager.dart';
 import '../../domain/update/update_service.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'widgets/pin_dialog.dart';
 
 /// Settings: Appearance, Maintenance (logos + background tasks), Updates, About.
 class SettingsPage extends ConsumerWidget {
@@ -78,6 +83,22 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => ref.read(downloadCurrentLogosProvider)(),
           ),
           const _TasksPanel(),
+          const Divider(height: 32),
+          _SectionHeader(l10n.settingsParental),
+          const _ParentalTile(),
+          const Divider(height: 32),
+          _SectionHeader(l10n.settingsRecording),
+          const _RecordingTemplateTile(),
+          if (FeatureFlags.chromecast) ...<Widget>[
+            const Divider(height: 32),
+            _SectionHeader(l10n.settingsCast),
+            ListTile(
+              leading: const Icon(Icons.cast),
+              title: Text(l10n.settingsCast),
+              subtitle: Text(l10n.settingsCastSoon),
+              enabled: false,
+            ),
+          ],
           const Divider(height: 32),
           _SectionHeader(l10n.settingsUpdates),
           const _UpdatesTile(),
@@ -214,6 +235,123 @@ class _UpdatesTileState extends ConsumerState<_UpdatesTile> {
               width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
           : const Icon(Icons.refresh),
       onTap: _busy ? null : _check,
+    );
+  }
+}
+
+/// Set / change / remove the parental PIN (spec §9).
+class _ParentalTile extends ConsumerWidget {
+  const _ParentalTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final ParentalState state = ref.watch(parentalControllerProvider);
+    final ParentalController ctrl =
+        ref.read(parentalControllerProvider.notifier);
+
+    Future<void> setPin() async {
+      final String? pin =
+          await showPinDialog(context, title: l10n.parentalNewPin);
+      if (pin != null) await ctrl.setPin(pin);
+    }
+
+    Future<void> changePin() async {
+      final String? current =
+          await showPinDialog(context, title: l10n.parentalCurrentPin);
+      if (current == null || !ctrl.unlock(current)) {
+        if (context.mounted && current != null) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l10n.parentalWrongPin)));
+        }
+        return;
+      }
+      if (!context.mounted) return;
+      final String? next =
+          await showPinDialog(context, title: l10n.parentalNewPin);
+      if (next != null) await ctrl.setPin(next);
+    }
+
+    Future<void> removePin() async {
+      final String? current =
+          await showPinDialog(context, title: l10n.parentalCurrentPin);
+      if (current == null) return;
+      final bool ok = await ctrl.removePin(current);
+      if (!ok && context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.parentalWrongPin)));
+      }
+    }
+
+    return ListTile(
+      leading: Icon(state.hasPin ? Icons.lock : Icons.lock_open_outlined),
+      title: Text(l10n.settingsParental),
+      subtitle:
+          Text(state.hasPin ? l10n.settingsParentalOn : l10n.settingsParentalOff),
+      trailing: state.hasPin
+          ? Wrap(
+              spacing: 4,
+              children: <Widget>[
+                TextButton(
+                    onPressed: changePin, child: Text(l10n.settingsChangePin)),
+                TextButton(
+                    onPressed: removePin, child: Text(l10n.settingsRemovePin)),
+              ],
+            )
+          : FilledButton(onPressed: setPin, child: Text(l10n.settingsSetPin)),
+    );
+  }
+}
+
+/// Edits the recording filename template (wired to PrefKeys.recordingTemplate).
+class _RecordingTemplateTile extends ConsumerWidget {
+  const _RecordingTemplateTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final String template = ref.watch(recordingTemplateProvider);
+
+    Future<void> edit() async {
+      final TextEditingController controller =
+          TextEditingController(text: template);
+      final String? result = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.settingsFilenameTemplate),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: '{channel} - {epgTitle} - {date} {time}',
+            ),
+            onSubmitted: (v) => Navigator.of(context).pop(v.trim()),
+          ),
+          actions: <Widget>[
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.commonCancel)),
+            FilledButton(
+                onPressed: () =>
+                    Navigator.of(context).pop(controller.text.trim()),
+                child: Text(l10n.commonSave)),
+          ],
+        ),
+      );
+      if (result != null && result.isNotEmpty) {
+        await ref
+            .read(sharedPreferencesProvider)
+            .setString(PrefKeys.recordingTemplate, result);
+        ref.invalidate(recordingTemplateProvider);
+      }
+    }
+
+    return ListTile(
+      leading: const Icon(Icons.text_fields),
+      title: Text(l10n.settingsFilenameTemplate),
+      subtitle: Text(template, maxLines: 1, overflow: TextOverflow.ellipsis),
+      trailing: const Icon(Icons.edit_outlined),
+      onTap: edit,
     );
   }
 }

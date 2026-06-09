@@ -6,4 +6,8 @@ abstract final class FeatureFlags {
   /// Offer the YouTube source in the add-provider UI.
   static const bool youtube =
       bool.fromEnvironment('STREAMHUB_YOUTUBE', defaultValue: false);
+
+  /// Chromecast sender (spec §8 — flagged; the CastEngine isn't wired yet).
+  static const bool chromecast =
+      bool.fromEnvironment('STREAMHUB_CHROMECAST', defaultValue: false);
 }

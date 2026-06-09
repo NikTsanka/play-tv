@@ -526,4 +526,56 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get taskCancel => 'Отмена';
+
+  @override
+  String get settingsParental => 'Родительский контроль';
+
+  @override
+  String get settingsParentalOff =>
+      'PIN не задан — защищённые каналы играют свободно';
+
+  @override
+  String get settingsParentalOn => 'Защищённые каналы требуют PIN';
+
+  @override
+  String get settingsSetPin => 'Задать PIN';
+
+  @override
+  String get settingsChangePin => 'Изменить PIN';
+
+  @override
+  String get settingsRemovePin => 'Удалить PIN';
+
+  @override
+  String get settingsRecording => 'Запись';
+
+  @override
+  String get settingsFilenameTemplate => 'Шаблон имени файла';
+
+  @override
+  String get settingsCast => 'Chromecast';
+
+  @override
+  String get settingsCastSoon => 'Скоро';
+
+  @override
+  String get parentalEnterPin => 'Введите PIN';
+
+  @override
+  String get parentalNewPin => 'Новый PIN';
+
+  @override
+  String get parentalCurrentPin => 'Текущий PIN';
+
+  @override
+  String get parentalWrongPin => 'Неверный PIN';
+
+  @override
+  String get parentalLocked => 'Этот канал заблокирован';
+
+  @override
+  String get commonOk => 'OK';
+
+  @override
+  String get commonSave => 'Сохранить';
 }

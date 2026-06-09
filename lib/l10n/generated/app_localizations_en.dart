@@ -524,4 +524,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskCancel => 'Cancel';
+
+  @override
+  String get settingsParental => 'Parental control';
+
+  @override
+  String get settingsParentalOff =>
+      'No PIN set — protected channels play freely';
+
+  @override
+  String get settingsParentalOn => 'Protected channels require a PIN';
+
+  @override
+  String get settingsSetPin => 'Set PIN';
+
+  @override
+  String get settingsChangePin => 'Change PIN';
+
+  @override
+  String get settingsRemovePin => 'Remove PIN';
+
+  @override
+  String get settingsRecording => 'Recording';
+
+  @override
+  String get settingsFilenameTemplate => 'Filename template';
+
+  @override
+  String get settingsCast => 'Chromecast';
+
+  @override
+  String get settingsCastSoon => 'Coming soon';
+
+  @override
+  String get parentalEnterPin => 'Enter PIN';
+
+  @override
+  String get parentalNewPin => 'New PIN';
+
+  @override
+  String get parentalCurrentPin => 'Current PIN';
+
+  @override
+  String get parentalWrongPin => 'Wrong PIN';
+
+  @override
+  String get parentalLocked => 'This channel is locked';
+
+  @override
+  String get commonOk => 'OK';
+
+  @override
+  String get commonSave => 'Save';
 }

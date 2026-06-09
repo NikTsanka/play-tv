@@ -5,7 +5,9 @@ import '../../../domain/channels/channel.dart';
 import '../../../domain/channels/channel_tree.dart';
 import '../../../domain/channels/channels_providers.dart';
 import '../../../domain/channels/zapping_controller.dart';
+import '../../../domain/parental/parental_control.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../settings/widgets/pin_dialog.dart';
 
 /// Left-side channel tree: search + collapsible groups. Flattened into a single
 /// virtualized list so 10k+ channels scroll smoothly (spec §5/§12).
@@ -20,12 +22,33 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
   final Set<String> _expanded = <String>{};
   String _query = '';
 
+  /// Plays [c], prompting for the parental PIN first if it's locked (spec §9).
+  Future<void> _playChannel(Channel c) async {
+    final ParentalController parental =
+        ref.read(parentalControllerProvider.notifier);
+    if (parental.isLocked(c)) {
+      final l10n = AppLocalizations.of(context);
+      final String? pin =
+          await showPinDialog(context, title: l10n.parentalEnterPin);
+      if (pin == null) return;
+      if (!parental.unlock(pin)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l10n.parentalWrongPin)));
+        }
+        return;
+      }
+    }
+    await ref.read(zappingProvider.notifier).play(c);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final all = ref.watch(currentChannelsProvider).valueOrNull ?? const <Channel>[];
     final current = ref.watch(zappingProvider).current;
+    final ParentalState parental = ref.watch(parentalControllerProvider);
 
     final filtered = filterChannels(all, _query);
     final groups = groupChannels(filtered, ungroupedLabel: l10n.channelsUngrouped);
@@ -93,8 +116,8 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
                 return _ChannelTile(
                   channel: c,
                   selected: current?.id == c.id,
-                  onTap: () =>
-                      ref.read(zappingProvider.notifier).play(c),
+                  locked: parental.isLocked(c),
+                  onTap: () => _playChannel(c),
                 );
               },
             ),
@@ -174,11 +197,13 @@ class _ChannelTile extends StatelessWidget {
   const _ChannelTile({
     required this.channel,
     required this.selected,
+    required this.locked,
     required this.onTap,
   });
 
   final Channel channel;
   final bool selected;
+  final bool locked;
   final VoidCallback onTap;
 
   @override
@@ -212,7 +237,9 @@ class _ChannelTile extends StatelessWidget {
                   ),
                 ),
               ),
-              if (channel.hasArchive)
+              if (locked)
+                Icon(Icons.lock_outline, size: 14, color: scheme.onSurfaceVariant)
+              else if (channel.hasArchive)
                 Icon(Icons.history, size: 14, color: scheme.onSurfaceVariant),
             ],
           ),
