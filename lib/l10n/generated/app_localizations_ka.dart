@@ -276,6 +276,28 @@ class AppLocalizationsKa extends AppLocalizations {
   String get providerParentalCode => 'მშობლის PIN (არასავალდებულო)';
 
   @override
+  String get providerLocalFolder => 'ლოკალური საქაღალდე';
+
+  @override
+  String get providerLocalFolderDesc =>
+      'ვიდეო / მუსიკის საქაღალდის ინდექსირება';
+
+  @override
+  String get providerChooseFolder => 'საქაღალდის არჩევა…';
+
+  @override
+  String get providerNoFolder => 'საქაღალდე არ არის არჩეული';
+
+  @override
+  String get providerYoutube => 'YouTube';
+
+  @override
+  String get providerYoutubeDesc => 'არხის, ფლეილისტის ან ვიდეოს URL';
+
+  @override
+  String get providerYoutubeUrl => 'YouTube URL';
+
+  @override
   String get providerPlaylistUrl => 'ფლეილისტის URL';
 
   @override

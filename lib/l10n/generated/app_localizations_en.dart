@@ -275,6 +275,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get providerParentalCode => 'Parental PIN (optional)';
 
   @override
+  String get providerLocalFolder => 'Local folder';
+
+  @override
+  String get providerLocalFolderDesc => 'Index a folder of video / music files';
+
+  @override
+  String get providerChooseFolder => 'Choose folder…';
+
+  @override
+  String get providerNoFolder => 'No folder selected';
+
+  @override
+  String get providerYoutube => 'YouTube';
+
+  @override
+  String get providerYoutubeDesc => 'Channel, playlist or video URL';
+
+  @override
+  String get providerYoutubeUrl => 'YouTube URL';
+
+  @override
   String get providerPlaylistUrl => 'Playlist URL';
 
   @override

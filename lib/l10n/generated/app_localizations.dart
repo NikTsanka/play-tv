@@ -616,6 +616,48 @@ abstract class AppLocalizations {
   /// **'Parental PIN (optional)'**
   String get providerParentalCode;
 
+  /// No description provided for @providerLocalFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Local folder'**
+  String get providerLocalFolder;
+
+  /// No description provided for @providerLocalFolderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Index a folder of video / music files'**
+  String get providerLocalFolderDesc;
+
+  /// No description provided for @providerChooseFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose folder…'**
+  String get providerChooseFolder;
+
+  /// No description provided for @providerNoFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'No folder selected'**
+  String get providerNoFolder;
+
+  /// No description provided for @providerYoutube.
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube'**
+  String get providerYoutube;
+
+  /// No description provided for @providerYoutubeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel, playlist or video URL'**
+  String get providerYoutubeDesc;
+
+  /// No description provided for @providerYoutubeUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube URL'**
+  String get providerYoutubeUrl;
+
   /// No description provided for @providerPlaylistUrl.
   ///
   /// In en, this message translates to:

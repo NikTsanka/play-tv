@@ -58,6 +58,9 @@ dependencies:
   # Iterable helpers (firstOrNull, groupBy, …).
   collection: ^1.18.0
 
+  # YouTube source (spec §4.6, feature-flagged): channel/playlist/video → stream.
+  youtube_explode_dart: ^2.3.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

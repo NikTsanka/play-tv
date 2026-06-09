@@ -2,17 +2,29 @@ import 'provider.dart';
 import 'provider_config.dart';
 import 'sources/generic_url_provider.dart';
 import 'sources/iptv_org_provider.dart';
+import 'sources/local_folder_provider.dart';
 import 'sources/m3u_provider.dart';
 import 'sources/ott/ott_base_provider.dart';
 import 'sources/ott/ott_service.dart';
 import 'sources/stalker/stalker_provider.dart';
 import 'sources/xtream/xtream_provider.dart';
+import 'sources/youtube_provider.dart';
 
 /// The channel-source kinds wired in this build. Each maps to a concrete
-/// [Provider] via the [ProviderRegistry]; later milestones add local files,
-/// YouTube, … (spec §4). `ott` is a family — the branded service is chosen in
-/// `ProviderConfig.settings['service']` (spec §4.4 / Appendix C).
-enum ProviderType { m3uUrl, m3uFile, genericUrl, iptvOrg, xtream, stalker, ott }
+/// [Provider] via the [ProviderRegistry]. `ott` is a family — the branded
+/// service is chosen in `ProviderConfig.settings['service']` (spec §4.4 /
+/// Appendix C). `youtube` is feature-flagged at the setup UI (spec §4.6).
+enum ProviderType {
+  m3uUrl,
+  m3uFile,
+  genericUrl,
+  iptvOrg,
+  xtream,
+  stalker,
+  ott,
+  localFolder,
+  youtube,
+}
 
 extension ProviderTypeId on ProviderType {
   /// Stable id persisted in `Playlists.kind`.
@@ -119,6 +131,24 @@ class ProviderRegistry {
         },
         create: (ProviderConfig c) =>
             OttBaseProvider(ottServiceById(c.setting('service')), c),
+      ),
+      const ProviderTypeDescriptor(
+        type: ProviderType.localFolder,
+        functions: <ProviderFunction>{
+          ProviderFunction.live,
+          ProviderFunction.radio,
+          ProviderFunction.vod,
+        },
+        create: LocalFolderProvider.new,
+      ),
+      const ProviderTypeDescriptor(
+        type: ProviderType.youtube,
+        functions: <ProviderFunction>{
+          ProviderFunction.live,
+          ProviderFunction.vod,
+          ProviderFunction.logos,
+        },
+        create: YoutubeProvider.new,
       ),
     ];
     return <ProviderType, ProviderTypeDescriptor>{

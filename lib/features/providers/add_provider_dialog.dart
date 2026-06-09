@@ -2,6 +2,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/feature_flags.dart';
 import '../../domain/channels/channels_providers.dart';
 import '../../domain/providers/provider_config.dart';
 import '../../domain/providers/provider_type.dart';
@@ -45,6 +46,11 @@ List<_TypeInfo> _types(AppLocalizations l10n) => <_TypeInfo>[
           l10n.providerGenericUrl, l10n.providerGenericUrlDesc),
       _TypeInfo(ProviderType.iptvOrg, Icons.public, l10n.providerIptvOrg,
           l10n.providerIptvOrgDesc),
+      _TypeInfo(ProviderType.localFolder, Icons.folder_outlined,
+          l10n.providerLocalFolder, l10n.providerLocalFolderDesc),
+      if (FeatureFlags.youtube)
+        _TypeInfo(ProviderType.youtube, Icons.smart_display_outlined,
+            l10n.providerYoutube, l10n.providerYoutubeDesc),
     ];
 
 class _AddProviderDialog extends ConsumerStatefulWidget {
@@ -64,6 +70,7 @@ class _AddProviderDialogState extends ConsumerState<_AddProviderDialog> {
   final TextEditingController _macCtrl = TextEditingController();
   final TextEditingController _loginCtrl = TextEditingController();
   String? _filePath;
+  String? _folderPath;
   bool _isRadio = false;
   IptvOrgScope _scope = IptvOrgScope.all;
   OttService _ottService = ottServices.first;
@@ -102,6 +109,17 @@ class _AddProviderDialogState extends ConsumerState<_AddProviderDialog> {
     setState(() {
       _filePath = file.path;
       if (_nameCtrl.text.trim().isEmpty) _nameCtrl.text = file.name;
+    });
+  }
+
+  Future<void> _pickFolder() async {
+    final String? dir = await getDirectoryPath();
+    if (dir == null) return;
+    setState(() {
+      _folderPath = dir;
+      if (_nameCtrl.text.trim().isEmpty) {
+        _nameCtrl.text = dir.split(RegExp(r'[\\/]')).last;
+      }
     });
   }
 
@@ -157,6 +175,12 @@ class _AddProviderDialogState extends ConsumerState<_AddProviderDialog> {
         if (_codeCtrl.text.trim().isNotEmpty) {
           settings['parentalCode'] = _codeCtrl.text.trim();
         }
+      case ProviderType.localFolder:
+        if (_folderPath == null) return _fail('Choose a folder');
+        location = _folderPath!;
+      case ProviderType.youtube:
+        location = _locationCtrl.text.trim();
+        if (location.isEmpty) return _fail('Enter a YouTube URL');
     }
 
     final String name =
@@ -504,6 +528,39 @@ class _AddProviderDialogState extends ConsumerState<_AddProviderDialog> {
             decoration: InputDecoration(
               labelText: l10n.providerParentalCode,
               prefixIcon: const Icon(Icons.pin_outlined),
+            ),
+            onSubmitted: (_) => _busy ? null : _submit(),
+          ),
+        ];
+      case ProviderType.localFolder:
+        return <Widget>[
+          Row(
+            children: <Widget>[
+              OutlinedButton.icon(
+                onPressed: _busy ? null : _pickFolder,
+                icon: const Icon(Icons.folder_open),
+                label: Text(l10n.providerChooseFolder),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _folderPath ?? l10n.providerNoFolder,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ),
+        ];
+      case ProviderType.youtube:
+        return <Widget>[
+          TextField(
+            controller: _locationCtrl,
+            enabled: !_busy,
+            decoration: InputDecoration(
+              labelText: l10n.providerYoutubeUrl,
+              hintText: 'https://youtube.com/playlist?list=…',
+              prefixIcon: const Icon(Icons.smart_display_outlined),
             ),
             onSubmitted: (_) => _busy ? null : _submit(),
           ),

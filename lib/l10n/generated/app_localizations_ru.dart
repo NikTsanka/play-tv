@@ -276,6 +276,27 @@ class AppLocalizationsRu extends AppLocalizations {
   String get providerParentalCode => 'Родительский PIN (необязательно)';
 
   @override
+  String get providerLocalFolder => 'Локальная папка';
+
+  @override
+  String get providerLocalFolderDesc => 'Индексировать папку с видео / музыкой';
+
+  @override
+  String get providerChooseFolder => 'Выбрать папку…';
+
+  @override
+  String get providerNoFolder => 'Папка не выбрана';
+
+  @override
+  String get providerYoutube => 'YouTube';
+
+  @override
+  String get providerYoutubeDesc => 'URL канала, плейлиста или видео';
+
+  @override
+  String get providerYoutubeUrl => 'URL YouTube';
+
+  @override
   String get providerPlaylistUrl => 'URL плейлиста';
 
   @override
