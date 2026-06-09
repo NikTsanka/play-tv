@@ -461,4 +461,48 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get recStarted => 'Запись начата';
+
+  @override
+  String get settingsMaintenance => 'Обслуживание';
+
+  @override
+  String get settingsDownloadLogos => 'Загрузить логотипы каналов';
+
+  @override
+  String get settingsDownloadLogosSub =>
+      'Кэшировать логотипы текущего плейлиста';
+
+  @override
+  String get settingsTasks => 'Фоновые задачи';
+
+  @override
+  String get settingsNoTasks => 'Нет активных задач';
+
+  @override
+  String get settingsClearTasks => 'Очистить завершённые';
+
+  @override
+  String get settingsUpdates => 'Обновления';
+
+  @override
+  String get settingsCheckUpdates => 'Проверить обновления';
+
+  @override
+  String get settingsUpdateChecking => 'Проверка…';
+
+  @override
+  String settingsUpToDate(String version) {
+    return 'У вас последняя версия ($version)';
+  }
+
+  @override
+  String settingsUpdateAvailable(String version) {
+    return 'Доступно обновление: $version';
+  }
+
+  @override
+  String get settingsUpdateFailed => 'Не удалось проверить обновления';
+
+  @override
+  String get taskCancel => 'Отмена';
 }

@@ -461,4 +461,48 @@ class AppLocalizationsKa extends AppLocalizations {
 
   @override
   String get recStarted => 'ჩაწერა დაიწყო';
+
+  @override
+  String get settingsMaintenance => 'მოვლა';
+
+  @override
+  String get settingsDownloadLogos => 'არხების ლოგოების ჩამოტვირთვა';
+
+  @override
+  String get settingsDownloadLogosSub =>
+      'ლოგოების ქეშირება მიმდინარე ფლეილისტისთვის';
+
+  @override
+  String get settingsTasks => 'ფონური ამოცანები';
+
+  @override
+  String get settingsNoTasks => 'აქტიური ამოცანები არ არის';
+
+  @override
+  String get settingsClearTasks => 'დასრულებულების გასუფთავება';
+
+  @override
+  String get settingsUpdates => 'განახლებები';
+
+  @override
+  String get settingsCheckUpdates => 'განახლებების შემოწმება';
+
+  @override
+  String get settingsUpdateChecking => 'მოწმდება…';
+
+  @override
+  String settingsUpToDate(String version) {
+    return 'თქვენ გაქვთ უახლესი ვერსია ($version)';
+  }
+
+  @override
+  String settingsUpdateAvailable(String version) {
+    return 'ხელმისაწვდომია განახლება: $version';
+  }
+
+  @override
+  String get settingsUpdateFailed => 'განახლების შემოწმება ვერ მოხერხდა';
+
+  @override
+  String get taskCancel => 'გაუქმება';
 }

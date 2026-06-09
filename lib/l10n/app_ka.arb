@@ -115,6 +115,22 @@
   "recNothingPlaying": "არხი არ უკრავს",
   "recStarted": "ჩაწერა დაიწყო",
 
+  "settingsMaintenance": "მოვლა",
+  "settingsDownloadLogos": "არხების ლოგოების ჩამოტვირთვა",
+  "settingsDownloadLogosSub": "ლოგოების ქეშირება მიმდინარე ფლეილისტისთვის",
+  "settingsTasks": "ფონური ამოცანები",
+  "settingsNoTasks": "აქტიური ამოცანები არ არის",
+  "settingsClearTasks": "დასრულებულების გასუფთავება",
+  "settingsUpdates": "განახლებები",
+  "settingsCheckUpdates": "განახლებების შემოწმება",
+  "settingsUpdateChecking": "მოწმდება…",
+  "settingsUpToDate": "თქვენ გაქვთ უახლესი ვერსია ({version})",
+  "@settingsUpToDate": { "placeholders": { "version": { "type": "String" } } },
+  "settingsUpdateAvailable": "ხელმისაწვდომია განახლება: {version}",
+  "@settingsUpdateAvailable": { "placeholders": { "version": { "type": "String" } } },
+  "settingsUpdateFailed": "განახლების შემოწმება ვერ მოხერხდა",
+  "taskCancel": "გაუქმება",
+
   "commonBack": "უკან",
   "commonDelete": "წაშლა",
 

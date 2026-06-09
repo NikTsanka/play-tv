@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/locale_controller.dart';
 import '../../app/theme/theme_controller.dart';
+import '../../core/app_info.dart';
+import '../../domain/logos/logo_service.dart';
+import '../../domain/tasks/task_manager.dart';
+import '../../domain/update/update_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 
-/// Settings — milestone 1 covers Appearance (theme mode + language) + About.
-/// The full settings groups (Playback, Video, Audio, Network, Record, …) land
-/// in later milestones.
+/// Settings: Appearance, Maintenance (logos + background tasks), Updates, About.
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
@@ -67,14 +69,151 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
           const Divider(height: 32),
+          _SectionHeader(l10n.settingsMaintenance),
+          ListTile(
+            leading: const Icon(Icons.image_outlined),
+            title: Text(l10n.settingsDownloadLogos),
+            subtitle: Text(l10n.settingsDownloadLogosSub),
+            trailing: const Icon(Icons.download),
+            onTap: () => ref.read(downloadCurrentLogosProvider)(),
+          ),
+          const _TasksPanel(),
+          const Divider(height: 32),
+          _SectionHeader(l10n.settingsUpdates),
+          const _UpdatesTile(),
+          const Divider(height: 32),
           _SectionHeader(l10n.settingsAbout),
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.appTitle),
-            subtitle: Text(l10n.settingsVersion('0.1.0')),
+            subtitle: Text(l10n.settingsVersion(AppInfo.appVersion)),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Live list of background tasks with progress + cancel (spec §11).
+class _TasksPanel extends ConsumerWidget {
+  const _TasksPanel();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final List<TaskProgress> tasks =
+        ref.watch(tasksStreamProvider).valueOrNull ?? const <TaskProgress>[];
+    if (tasks.isEmpty) {
+      return ListTile(
+        leading: const Icon(Icons.checklist_outlined),
+        title: Text(l10n.settingsTasks),
+        subtitle: Text(l10n.settingsNoTasks),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+          child: Row(
+            children: <Widget>[
+              Expanded(child: Text(l10n.settingsTasks)),
+              TextButton(
+                onPressed: () =>
+                    ref.read(taskManagerProvider).clearFinished(),
+                child: Text(l10n.settingsClearTasks),
+              ),
+            ],
+          ),
+        ),
+        for (final TaskProgress t in tasks)
+          ListTile(
+            dense: true,
+            leading: _statusIcon(context, t.status),
+            title: Text(t.message ?? t.label,
+                maxLines: 1, overflow: TextOverflow.ellipsis),
+            subtitle: t.isActive
+                ? LinearProgressIndicator(value: t.progress)
+                : Text(t.error ?? t.status.name),
+            trailing: t.isActive
+                ? IconButton(
+                    tooltip: l10n.taskCancel,
+                    icon: const Icon(Icons.close),
+                    onPressed: () => ref.read(taskManagerProvider).cancel(t.id),
+                  )
+                : null,
+          ),
+      ],
+    );
+  }
+
+  Widget _statusIcon(BuildContext context, TaskStatus status) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return switch (status) {
+      TaskStatus.completed => Icon(Icons.check_circle, color: scheme.primary),
+      TaskStatus.failed => Icon(Icons.error_outline, color: scheme.error),
+      TaskStatus.cancelled => const Icon(Icons.cancel_outlined),
+      _ => const Icon(Icons.downloading_outlined),
+    };
+  }
+}
+
+/// "Check for updates" with an inline result (spec §11).
+class _UpdatesTile extends ConsumerStatefulWidget {
+  const _UpdatesTile();
+
+  @override
+  ConsumerState<_UpdatesTile> createState() => _UpdatesTileState();
+}
+
+class _UpdatesTileState extends ConsumerState<_UpdatesTile> {
+  bool _busy = false;
+  String? _result;
+  bool _isError = false;
+
+  Future<void> _check() async {
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      _busy = true;
+      _result = null;
+      _isError = false;
+    });
+    try {
+      final UpdateInfo info = await ref.read(updateServiceProvider).check();
+      if (!mounted) return;
+      setState(() {
+        _result = info.available
+            ? l10n.settingsUpdateAvailable(info.latest)
+            : l10n.settingsUpToDate(info.current);
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _result = l10n.settingsUpdateFailed;
+        _isError = true;
+      });
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListTile(
+      leading: const Icon(Icons.system_update_outlined),
+      title: Text(l10n.settingsCheckUpdates),
+      subtitle: _result == null
+          ? null
+          : Text(_result!,
+              style: _isError
+                  ? TextStyle(color: Theme.of(context).colorScheme.error)
+                  : null),
+      trailing: _busy
+          ? const SizedBox(
+              width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+          : const Icon(Icons.refresh),
+      onTap: _busy ? null : _check,
     );
   }
 }

@@ -162,5 +162,21 @@
   "recRecord": "Record",
   "recScheduled": "Recording scheduled",
   "recNothingPlaying": "No channel is playing",
-  "recStarted": "Recording started"
+  "recStarted": "Recording started",
+
+  "settingsMaintenance": "Maintenance",
+  "settingsDownloadLogos": "Download channel logos",
+  "settingsDownloadLogosSub": "Cache logos for the current playlist",
+  "settingsTasks": "Background tasks",
+  "settingsNoTasks": "No active tasks",
+  "settingsClearTasks": "Clear finished",
+  "settingsUpdates": "Updates",
+  "settingsCheckUpdates": "Check for updates",
+  "settingsUpdateChecking": "Checking…",
+  "settingsUpToDate": "You're up to date ({version})",
+  "@settingsUpToDate": { "placeholders": { "version": { "type": "String" } } },
+  "settingsUpdateAvailable": "Update available: {version}",
+  "@settingsUpdateAvailable": { "placeholders": { "version": { "type": "String" } } },
+  "settingsUpdateFailed": "Update check failed",
+  "taskCancel": "Cancel"
 }

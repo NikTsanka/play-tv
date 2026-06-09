@@ -115,6 +115,22 @@
   "recNothingPlaying": "Канал не воспроизводится",
   "recStarted": "Запись начата",
 
+  "settingsMaintenance": "Обслуживание",
+  "settingsDownloadLogos": "Загрузить логотипы каналов",
+  "settingsDownloadLogosSub": "Кэшировать логотипы текущего плейлиста",
+  "settingsTasks": "Фоновые задачи",
+  "settingsNoTasks": "Нет активных задач",
+  "settingsClearTasks": "Очистить завершённые",
+  "settingsUpdates": "Обновления",
+  "settingsCheckUpdates": "Проверить обновления",
+  "settingsUpdateChecking": "Проверка…",
+  "settingsUpToDate": "У вас последняя версия ({version})",
+  "@settingsUpToDate": { "placeholders": { "version": { "type": "String" } } },
+  "settingsUpdateAvailable": "Доступно обновление: {version}",
+  "@settingsUpdateAvailable": { "placeholders": { "version": { "type": "String" } } },
+  "settingsUpdateFailed": "Не удалось проверить обновления",
+  "taskCancel": "Отмена",
+
   "commonBack": "Назад",
   "commonDelete": "Удалить",
 

@@ -460,4 +460,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recStarted => 'Recording started';
+
+  @override
+  String get settingsMaintenance => 'Maintenance';
+
+  @override
+  String get settingsDownloadLogos => 'Download channel logos';
+
+  @override
+  String get settingsDownloadLogosSub => 'Cache logos for the current playlist';
+
+  @override
+  String get settingsTasks => 'Background tasks';
+
+  @override
+  String get settingsNoTasks => 'No active tasks';
+
+  @override
+  String get settingsClearTasks => 'Clear finished';
+
+  @override
+  String get settingsUpdates => 'Updates';
+
+  @override
+  String get settingsCheckUpdates => 'Check for updates';
+
+  @override
+  String get settingsUpdateChecking => 'Checking…';
+
+  @override
+  String settingsUpToDate(String version) {
+    return 'You\'re up to date ($version)';
+  }
+
+  @override
+  String settingsUpdateAvailable(String version) {
+    return 'Update available: $version';
+  }
+
+  @override
+  String get settingsUpdateFailed => 'Update check failed';
+
+  @override
+  String get taskCancel => 'Cancel';
 }

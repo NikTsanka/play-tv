@@ -975,6 +975,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recording started'**
   String get recStarted;
+
+  /// No description provided for @settingsMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance'**
+  String get settingsMaintenance;
+
+  /// No description provided for @settingsDownloadLogos.
+  ///
+  /// In en, this message translates to:
+  /// **'Download channel logos'**
+  String get settingsDownloadLogos;
+
+  /// No description provided for @settingsDownloadLogosSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache logos for the current playlist'**
+  String get settingsDownloadLogosSub;
+
+  /// No description provided for @settingsTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Background tasks'**
+  String get settingsTasks;
+
+  /// No description provided for @settingsNoTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No active tasks'**
+  String get settingsNoTasks;
+
+  /// No description provided for @settingsClearTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear finished'**
+  String get settingsClearTasks;
+
+  /// No description provided for @settingsUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get settingsUpdates;
+
+  /// No description provided for @settingsCheckUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates'**
+  String get settingsCheckUpdates;
+
+  /// No description provided for @settingsUpdateChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get settingsUpdateChecking;
+
+  /// No description provided for @settingsUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re up to date ({version})'**
+  String settingsUpToDate(String version);
+
+  /// No description provided for @settingsUpdateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available: {version}'**
+  String settingsUpdateAvailable(String version);
+
+  /// No description provided for @settingsUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Update check failed'**
+  String get settingsUpdateFailed;
+
+  /// No description provided for @taskCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get taskCancel;
 }
 
 class _AppLocalizationsDelegate
