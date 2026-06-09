@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/window/fullscreen.dart';
 import '../../domain/recording/recording_providers.dart';
 import '../../domain/recording/schedule.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -31,6 +32,7 @@ class AppShell extends ConsumerWidget {
       }
     });
 
+    final bool fullscreen = ref.watch(fullscreenProvider);
     final ThemeMode mode = ref.watch(themeModeProvider);
     final Brightness platformBrightness =
         MediaQuery.platformBrightnessOf(context);
@@ -43,6 +45,9 @@ class AppShell extends ConsumerWidget {
     return Scaffold(
       body: Row(
         children: <Widget>[
+          // The whole nav rail collapses in fullscreen (F11) so only the
+          // active page is shown.
+          if (!fullscreen)
           ColoredBox(
             color: Theme.of(context).colorScheme.surface,
             child: Column(
@@ -123,7 +128,7 @@ class AppShell extends ConsumerWidget {
               ],
             ),
           ),
-          const VerticalDivider(width: 1),
+          if (!fullscreen) const VerticalDivider(width: 1),
           // Group page-content focus so D-pad traversal stays within the active
           // page and doesn't jump back to the rail unexpectedly (spec §9).
           Expanded(child: FocusTraversalGroup(child: navigationShell)),

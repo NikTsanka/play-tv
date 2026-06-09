@@ -32,7 +32,7 @@ class _StreamHubAppState extends ConsumerState<StreamHubApp> {
 
   bool _onKey(KeyEvent event) {
     if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.f11) {
-      Fullscreen.toggle();
+      ref.read(fullscreenProvider.notifier).toggle();
       return true;
     }
     return false;

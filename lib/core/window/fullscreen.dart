@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// Real OS-level window fullscreen (desktop only) — F11 behaviour that hides
@@ -28,3 +29,20 @@ abstract final class Fullscreen {
     await windowManager.setFullScreen(on);
   }
 }
+
+/// App-wide fullscreen state. Toggling it drives both the OS window
+/// ([Fullscreen.set]) and the UI (the shell hides the nav rail when true).
+class FullscreenController extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  Future<void> toggle() => set(!state);
+
+  Future<void> set(bool on) async {
+    state = on;
+    await Fullscreen.set(on);
+  }
+}
+
+final fullscreenProvider =
+    NotifierProvider<FullscreenController, bool>(FullscreenController.new);

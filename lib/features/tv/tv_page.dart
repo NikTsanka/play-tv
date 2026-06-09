@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/window/fullscreen.dart';
 import '../../domain/channels/channel.dart';
 import '../../domain/channels/channels_providers.dart';
 import '../../domain/channels/zapping_controller.dart';
@@ -48,12 +49,12 @@ class _TvPageState extends ConsumerState<TvPage> {
     });
   }
 
-  /// Adjusts volume by [delta] (0..100 scale) and flashes the OSD.
+  /// Adjusts volume by [delta] (0..100 scale). Does NOT reveal the OSD — the
+  /// channel-info card only shows on channel switches.
   void _changeVolume(double delta) {
     final engine = ref.read(playbackEngineProvider);
     final double current = ref.read(currentStatusProvider).volume;
     engine.setVolume((current + delta).clamp(0.0, 100.0));
-    _showOsd();
   }
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
@@ -188,6 +189,14 @@ class _TvPageState extends ConsumerState<TvPage> {
           ),
           actions: <Widget>[
             const _PlaylistSelector(),
+            IconButton(
+              tooltip: l10n.playerFullscreen,
+              icon: Icon(ref.watch(fullscreenProvider)
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen),
+              onPressed: () =>
+                  ref.read(fullscreenProvider.notifier).toggle(),
+            ),
             IconButton(
               tooltip: l10n.playlistDelete,
               icon: const Icon(Icons.playlist_remove),
