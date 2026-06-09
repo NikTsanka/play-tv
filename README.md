@@ -70,9 +70,17 @@ the language picker.
   with Start-menu/desktop shortcuts and an uninstaller.
 - **Windows (MSIX):** config lives under `msix_config:` in `pubspec.yaml`. Build with
   `dart run msix:create` (supply a signing certificate for store/sideload distribution).
-- **Android / Android TV:** `flutter build apk` / `flutter build appbundle`. The manifest declares
-  `INTERNET`, optional `leanback`/touchscreen features and a `LEANBACK_LAUNCHER` category so the
-  same artifact installs on phones and on the Android TV launcher.
+- **Android / Android TV:** `flutter build apk` (release ≈ 107 MB, debug-signed) or
+  `flutter build appbundle`. The manifest declares `INTERNET`, optional `leanback`/touchscreen
+  features and a `LEANBACK_LAUNCHER` category so the same artifact installs on phones and on the
+  Android TV launcher. Toolchain: AGP 8.7 / Kotlin 2.3.21 / Gradle 8.14.
+  > If your global Gradle config (`GRADLE_USER_HOME/gradle.properties`) enables the configuration
+  > cache, disable it for the build (a Kotlin-plugin + config-cache + JDK 21 issue) without touching
+  > your global config:
+  > ```
+  > set GRADLE_OPTS=-Dorg.gradle.configuration-cache=false
+  > flutter build apk --release
+  > ```
 
 ## Adding a provider
 
