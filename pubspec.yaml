@@ -1,0 +1,72 @@
+name: streamhub
+description: "StreamHub — universal IPTV / TV / Radio player (Flutter)."
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+# Milestone 1 (skeleton) dependency set. Later milestones add:
+#   media_kit + media_kit_video (playback), dio (http), drift + sqlite3 (DB),
+#   xml (XMLTV/XSPF), json_serializable, wakelock_plus, etc.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Playback core (Milestone 2): libmpv/FFmpeg via media_kit.
+  media_kit: ^1.1.11
+  media_kit_video: ^1.2.5
+  media_kit_libs_video: ^1.0.5
+  # Keep the screen awake during playback.
+  wakelock_plus: ^1.2.8
+
+  # State management (MVVM via Riverpod). Codegen can be layered in later.
+  flutter_riverpod: ^2.5.1
+
+  # Declarative, TV-focus-friendly navigation.
+  go_router: ^14.2.0
+
+  # Channel / EPG / VOD store (Milestone 3+): SQLite via drift.
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.24
+  path: ^1.9.0
+
+  # XMLTV / XSPF parsing.
+  xml: ^6.5.0
+
+  # Synced 2-D scrolling for the EPG grid (time header + channel column + body).
+  linked_scroll_controller: ^0.2.0
+
+  # HTTP (playlist / EPG downloads).
+  http: ^1.2.0
+
+  # Desktop/mobile file picking for local playlist import.
+  file_selector: ^1.0.3
+
+  # Persistence / app-data.
+  shared_preferences: ^2.2.3
+  path_provider: ^2.1.3
+
+  # Logging.
+  logger: ^2.3.0
+
+  # i18n runtime.
+  intl: any
+
+  # Iterable helpers (firstOrNull, groupBy, …).
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  # drift code generation.
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  generate: true
