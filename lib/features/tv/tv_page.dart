@@ -165,6 +165,14 @@ class _TvPageState extends ConsumerState<TvPage> {
     final channels = ref.watch(currentChannelsProvider).valueOrNull;
     final zap = ref.watch(zappingProvider);
 
+    // Reclaim keyboard focus after a fullscreen toggle (the window re-activates,
+    // so the zapping key handler must grab focus again).
+    ref.listen<bool>(fullscreenProvider, (prev, next) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _focus.requestFocus();
+      });
+    });
+
     // Reveal the OSD whenever the tuned channel or number-entry changes.
     ref.listen<ZapState>(zappingProvider, (prev, next) {
       if (prev?.current?.id != next.current?.id ||
@@ -233,6 +241,9 @@ class _TvPageState extends ConsumerState<TvPage> {
             Expanded(
               child: hasChannels || zap.current != null
                   ? Listener(
+                      // Any click in the video area reclaims keyboard focus so
+                      // arrow zapping keeps working (e.g. after fullscreen).
+                      onPointerDown: (_) => _focus.requestFocus(),
                       // Mouse wheel up / down → volume up / down.
                       onPointerSignal: (PointerSignalEvent signal) {
                         if (signal is PointerScrollEvent) {

@@ -27,6 +27,9 @@ abstract final class Fullscreen {
   static Future<void> set(bool on) async {
     if (!isSupported) return;
     await windowManager.setFullScreen(on);
+    // Toggling fullscreen de-activates the native window on Windows, which
+    // swallows keyboard/mouse input until re-focused.
+    await windowManager.focus();
   }
 }
 
