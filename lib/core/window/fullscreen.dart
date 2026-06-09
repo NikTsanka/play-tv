@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -25,6 +26,15 @@ abstract final class Fullscreen {
   }
 
   static Future<void> set(bool on) async {
+    // Mobile: hide/show the system status + navigation bars (immersive).
+    if (Platform.isAndroid || Platform.isIOS) {
+      await SystemChrome.setEnabledSystemUIMode(
+        on ? SystemUiMode.immersiveSticky : SystemUiMode.manual,
+        overlays: on ? const <SystemUiOverlay>[] : SystemUiOverlay.values,
+      );
+      return;
+    }
+    // Desktop: toggle the OS window fullscreen.
     if (!isSupported) return;
     await windowManager.setFullScreen(on);
     // Toggling fullscreen de-activates the native window on Windows, which
