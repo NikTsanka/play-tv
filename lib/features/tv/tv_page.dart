@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +18,10 @@ import '../player/widgets/player_surface.dart';
 import '../providers/add_provider_dialog.dart';
 import 'widgets/channel_tree_panel.dart';
 import 'widgets/osd_channel_info.dart';
+
+/// The zapping OSD card is shown only on desktop; on mobile (Android/iOS) it's
+/// hidden — it crowds the small screen.
+final bool _kOsdEnabled = !Platform.isAndroid && !Platform.isIOS;
 
 /// Main live-TV view: left channel tree + video + OSD, with keyboard zapping
 /// (↑/↓ channel, digits + Enter = number, Backspace clears). Spec §9.
@@ -332,8 +337,8 @@ class _VideoArea extends StatelessWidget {
                         fontWeight: FontWeight.bold)),
               ),
             ),
-          // Channel info OSD with live now/next from the EPG.
-          if (osdVisible && current != null)
+          // Channel info OSD with live now/next from the EPG (desktop only).
+          if (osdVisible && current != null && _kOsdEnabled)
             IgnorePointer(child: _OsdForChannel(channel: current!)),
         ],
       ),

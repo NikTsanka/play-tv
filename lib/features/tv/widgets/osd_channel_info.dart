@@ -24,68 +24,56 @@ class OsdChannelInfo extends StatelessWidget {
 
     return Align(
       alignment: Alignment.topCenter,
+      // Compact card, nudged toward the top edge.
       child: Container(
-        margin: const EdgeInsets.all(16),
-        constraints: const BoxConstraints(maxWidth: 560),
-        padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+        constraints: const BoxConstraints(maxWidth: 420),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.72),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: scheme.primary.withValues(alpha: 0.6)),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             // Channel number badge.
             Container(
-              width: 56,
-              height: 56,
+              width: 38,
+              height: 38,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: scheme.primary,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 channel.number?.toString() ?? '—',
                 style: const TextStyle(
                     color: Colors.black,
-                    fontSize: 22,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             _Logo(url: channel.logoUrl, isRadio: channel.isRadio),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
                     channel.name,
                     style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (channel.group != null)
-                    Text(
-                      channel.group!,
-                      style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 12),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  const SizedBox(height: 6),
                   _EpgLine(
                       icon: Icons.play_arrow,
                       text: nowTitle ?? l10n.osdNoGuide,
                       accent: scheme.primary),
-                  if (nextTitle != null)
-                    _EpgLine(
-                        icon: Icons.skip_next,
-                        text: nextTitle!,
-                        accent: Colors.white54),
                 ],
               ),
             ),
@@ -129,11 +117,11 @@ class _Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fallback =
-        Icon(isRadio ? Icons.radio : Icons.live_tv, color: Colors.white70);
+    final fallback = Icon(isRadio ? Icons.radio : Icons.live_tv,
+        size: 22, color: Colors.white70);
     return SizedBox(
-      width: 48,
-      height: 48,
+      width: 36,
+      height: 36,
       child: (url == null || url!.isEmpty)
           ? fallback
           : Image.network(url!,
