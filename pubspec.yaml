@@ -64,6 +64,9 @@ dependencies:
   # SHA-256 for the parental-control PIN (hashed at rest).
   crypto: ^3.0.0
 
+  # Desktop window control (F11 real fullscreen).
+  window_manager: ^0.4.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

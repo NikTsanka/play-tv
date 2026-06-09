@@ -23,9 +23,38 @@ class ChannelTreePanel extends ConsumerStatefulWidget {
 class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
   final Set<String> _expanded = <String>{};
   String _query = '';
+  static const double _itemExtent = 44;
 
-  /// Plays [c], prompting for the parental PIN first if it's locked (spec §9).
-  Future<void> _playChannel(Channel c) async {
+  final ScrollController _scrollController = ScrollController();
+  List<_Row> _rows = const <_Row>[];
+  String? _lastScrolledId;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Scrolls so the tuned channel's row stays on screen during zapping.
+  void _ensureVisible(String channelId) {
+    final int index =
+        _rows.indexWhere((_Row r) => r.channel?.id == channelId);
+    if (index < 0 || !_scrollController.hasClients) return;
+    final double offset = index * _itemExtent;
+    final ScrollPosition pos = _scrollController.position;
+    final double top = pos.pixels;
+    final double bottom = top + pos.viewportDimension;
+    if (offset < top || offset + _itemExtent > bottom) {
+      final double target = (offset - pos.viewportDimension / 2 + _itemExtent / 2)
+          .clamp(0.0, pos.maxScrollExtent);
+      _scrollController.animateTo(target,
+          duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    }
+  }
+
+  /// Plays [c] within category [scope], prompting for the parental PIN first if
+  /// it's locked (spec §9).
+  Future<void> _playChannel(Channel c, List<Channel> scope) async {
     final ParentalController parental =
         ref.read(parentalControllerProvider.notifier);
     if (parental.isLocked(c)) {
@@ -41,7 +70,7 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
         return;
       }
     }
-    await ref.read(zappingProvider.notifier).play(c);
+    await ref.read(zappingProvider.notifier).play(c, scope: scope);
   }
 
   @override
@@ -58,6 +87,19 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
         FavoriteItem.makeRefId(FavoriteKind.channel, sourceId, c.id);
     bool isFav(Channel c) => favIds.contains(refOf(c));
 
+    // Keep the tuned channel on screen (expand its group, then scroll to it).
+    ref.listen<Channel?>(zappingProvider.select((s) => s.current),
+        (Channel? prev, Channel? next) {
+      if (next == null || next.id == _lastScrolledId) return;
+      _lastScrolledId = next.id;
+      final String title = next.group ?? l10n.channelsUngrouped;
+      if (_query.trim().isEmpty && !_expanded.contains(title)) {
+        setState(() => _expanded.add(title));
+      }
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _ensureVisible(next.id));
+    });
+
     final filtered = filterChannels(all, _query);
     final groups = groupChannels(filtered, ungroupedLabel: l10n.channelsUngrouped);
 
@@ -73,7 +115,7 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
       rows.add(_Row.group(l10n.vodFavorites, favChannels.length, open));
       if (open) {
         for (final c in favChannels) {
-          rows.add(_Row.channel(c));
+          rows.add(_Row.channel(c, favChannels));
         }
       }
     }
@@ -83,10 +125,11 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
       rows.add(_Row.group(g.title, g.channels.length, open));
       if (open) {
         for (final c in g.channels) {
-          rows.add(_Row.channel(c));
+          rows.add(_Row.channel(c, g.channels));
         }
       }
     }
+    _rows = rows;
 
     return Column(
       children: <Widget>[
@@ -116,8 +159,9 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
         else
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: rows.length,
-              itemExtent: 44,
+              itemExtent: _itemExtent,
               itemBuilder: (context, i) {
                 final row = rows[i];
                 if (row.isGroup) {
@@ -143,7 +187,7 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
                   onFavorite: () => ref
                       .read(vodRepositoryProvider)
                       .toggleFavorite(FavoriteItem.fromChannel(c, sourceId)),
-                  onTap: () => _playChannel(c),
+                  onTap: () => _playChannel(c, row.scope),
                 );
               },
             ),
@@ -166,8 +210,9 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
 class _Row {
   _Row.group(this.title, this.count, this.expanded)
       : isGroup = true,
-        channel = null;
-  _Row.channel(this.channel)
+        channel = null,
+        scope = const <Channel>[];
+  _Row.channel(this.channel, this.scope)
       : isGroup = false,
         title = null,
         count = 0,
@@ -178,6 +223,9 @@ class _Row {
   final int count;
   final bool expanded;
   final Channel? channel;
+
+  /// The category list this channel belongs to (for scoped zapping).
+  final List<Channel> scope;
 }
 
 class _GroupHeader extends StatelessWidget {

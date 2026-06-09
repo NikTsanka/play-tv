@@ -7,12 +7,16 @@ import 'app/app.dart';
 import 'core/logging/app_logger.dart';
 import 'core/storage/app_paths.dart';
 import 'core/storage/preferences.dart';
+import 'core/window/fullscreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize the playback core (libmpv) before any engine is created.
   MediaKit.ensureInitialized();
+
+  // Desktop window control (enables F11 fullscreen).
+  await Fullscreen.init();
 
   // Bootstrap: app-data folders + simple settings store.
   await AppPaths.init();

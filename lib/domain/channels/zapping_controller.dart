@@ -41,7 +41,13 @@ class ZappingController extends Notifier<ZapState> {
 
   List<Channel> get _channels => ref.read(flatChannelsProvider);
 
-  Future<void> play(Channel channel) async {
+  /// The category the user is zapping within (favorites / a group). Up/down and
+  /// drag/wheel cycle inside this list and wrap at its ends, never crossing into
+  /// another category. Empty = fall back to the full channel list.
+  List<Channel> _scope = const <Channel>[];
+
+  Future<void> play(Channel channel, {List<Channel>? scope}) async {
+    if (scope != null) _scope = scope;
     final engine = ref.read(playbackEngineProvider);
     state = state.copyWith(
       previous: state.current,
@@ -74,7 +80,8 @@ class ZappingController extends Notifier<ZapState> {
   Future<void> previousChannel() => _step(-1);
 
   Future<void> _step(int delta) async {
-    final list = _channels;
+    // Cycle within the active category (wrap at the ends); fall back to all.
+    final list = _scope.isNotEmpty ? _scope : _channels;
     if (list.isEmpty) return;
     final int idx = state.current == null ? -1 : list.indexOf(state.current!);
     final int nextIdx = (idx + delta) % list.length;
@@ -100,7 +107,13 @@ class ZappingController extends Notifier<ZapState> {
     final n = int.tryParse(entry);
     if (n == null) return;
     final match = _channels.where((c) => c.number == n).firstOrNull;
-    if (match != null) await play(match);
+    if (match != null) {
+      // A number jump re-scopes to the target channel's own category.
+      await play(
+        match,
+        scope: _channels.where((c) => c.group == match.group).toList(),
+      );
+    }
   }
 
   void clearNumber() => state = state.copyWith(numberEntry: '');
