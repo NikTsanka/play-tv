@@ -52,6 +52,7 @@ class _PlayerSurfaceState extends ConsumerState<PlayerSurface> {
   int _fitIndex = 0;
   bool _controlsVisible = true;
   double _dragAccum = 0;
+  bool _swiped = false;
   Timer? _hideTimer;
 
   @override
@@ -110,18 +111,24 @@ class _PlayerSurfaceState extends ConsumerState<PlayerSurface> {
           behavior: HitTestBehavior.opaque,
           onTap: () => setState(() => _controlsVisible = !_controlsVisible),
           onDoubleTap: widget.onDoubleTap ?? widget.onToggleFullscreen,
-          onVerticalDragStart:
-              widget.onVerticalSwipe == null ? null : (_) => _dragAccum = 0,
+          onVerticalDragStart: widget.onVerticalSwipe == null
+              ? null
+              : (_) {
+                  _dragAccum = 0;
+                  _swiped = false;
+                },
+          // One channel step per drag gesture (not one per N pixels).
           onVerticalDragUpdate: widget.onVerticalSwipe == null
               ? null
               : (DragUpdateDetails d) {
+                  if (_swiped) return;
                   _dragAccum += d.delta.dy;
-                  const double step = 48;
+                  const double step = 40;
                   if (_dragAccum <= -step) {
-                    _dragAccum = 0;
+                    _swiped = true;
                     widget.onVerticalSwipe!(-1);
                   } else if (_dragAccum >= step) {
-                    _dragAccum = 0;
+                    _swiped = true;
                     widget.onVerticalSwipe!(1);
                   }
                 },

@@ -87,19 +87,6 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
         FavoriteItem.makeRefId(FavoriteKind.channel, sourceId, c.id);
     bool isFav(Channel c) => favIds.contains(refOf(c));
 
-    // Keep the tuned channel on screen (expand its group, then scroll to it).
-    ref.listen<Channel?>(zappingProvider.select((s) => s.current),
-        (Channel? prev, Channel? next) {
-      if (next == null || next.id == _lastScrolledId) return;
-      _lastScrolledId = next.id;
-      final String title = next.group ?? l10n.channelsUngrouped;
-      if (_query.trim().isEmpty && !_expanded.contains(title)) {
-        setState(() => _expanded.add(title));
-      }
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _ensureVisible(next.id));
-    });
-
     final filtered = filterChannels(all, _query);
     final groups = groupChannels(filtered, ungroupedLabel: l10n.channelsUngrouped);
 
@@ -130,6 +117,25 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
       }
     }
     _rows = rows;
+
+    // Reveal the tuned channel when it changes OR when the panel is (re)shown:
+    // expand its group and scroll it into view, keeping it highlighted. This
+    // restores the same category + selection after the list was hidden.
+    if (current != null && current.id != _lastScrolledId) {
+      _lastScrolledId = current.id;
+      final String title = current.group ?? l10n.channelsUngrouped;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_query.trim().isEmpty && !_expanded.contains(title)) {
+          setState(() => _expanded.add(title));
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _ensureVisible(current.id);
+          });
+        } else {
+          _ensureVisible(current.id);
+        }
+      });
+    }
 
     return Column(
       children: <Widget>[

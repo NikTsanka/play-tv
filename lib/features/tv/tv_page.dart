@@ -156,10 +156,9 @@ class _TvPageState extends ConsumerState<TvPage> {
     final zap = ref.watch(zappingProvider);
     final bool fullscreen = ref.watch(fullscreenProvider);
 
-    // Entering fullscreen hides the channel list (clean view); leaving restores
-    // it. Either way, reclaim keyboard focus for the zapping handler.
+    // Reclaim keyboard focus after a fullscreen toggle (the channel list keeps
+    // whatever show/hide state it had before — toggle it with Enter / dbl-click).
     ref.listen<bool>(fullscreenProvider, (prev, next) {
-      setState(() => _panelCollapsed = next);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _focus.requestFocus();
       });
