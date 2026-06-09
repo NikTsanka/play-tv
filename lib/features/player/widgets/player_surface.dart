@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -16,11 +17,27 @@ class PlayerSurface extends ConsumerStatefulWidget {
   const PlayerSurface({
     required this.isFullscreen,
     required this.onToggleFullscreen,
+    this.onVerticalSwipe,
+    this.onScrollVolume,
+    this.onActivate,
+    this.onDoubleTap,
     super.key,
   });
 
   final bool isFullscreen;
   final VoidCallback onToggleFullscreen;
+
+  /// Double-tap action; defaults to [onToggleFullscreen] when not provided.
+  final VoidCallback? onDoubleTap;
+
+  /// Vertical drag on the video: -1 = swiped up, +1 = swiped down (channel zap).
+  final void Function(int direction)? onVerticalSwipe;
+
+  /// Mouse-wheel over the video: signed volume delta (0..100 scale).
+  final void Function(double delta)? onScrollVolume;
+
+  /// Any pointer-down on the video (used to reclaim keyboard focus).
+  final VoidCallback? onActivate;
 
   @override
   ConsumerState<PlayerSurface> createState() => _PlayerSurfaceState();
@@ -34,6 +51,7 @@ class _PlayerSurfaceState extends ConsumerState<PlayerSurface> {
   ];
   int _fitIndex = 0;
   bool _controlsVisible = true;
+  double _dragAccum = 0;
   Timer? _hideTimer;
 
   @override
@@ -79,12 +97,35 @@ class _PlayerSurfaceState extends ConsumerState<PlayerSurface> {
     final bool showSpinner = status.state == PlaybackState.opening ||
         status.state == PlaybackState.buffering;
 
-    return MouseRegion(
-      onHover: (_) => _showControls(),
-      child: GestureDetector(
-        onTap: () => setState(() => _controlsVisible = !_controlsVisible),
-        onDoubleTap: widget.onToggleFullscreen,
-        child: ColoredBox(
+    return Listener(
+      onPointerDown: (_) => widget.onActivate?.call(),
+      onPointerSignal: (PointerSignalEvent signal) {
+        if (signal is PointerScrollEvent && widget.onScrollVolume != null) {
+          widget.onScrollVolume!(signal.scrollDelta.dy < 0 ? 5 : -5);
+        }
+      },
+      child: MouseRegion(
+        onHover: (_) => _showControls(),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => _controlsVisible = !_controlsVisible),
+          onDoubleTap: widget.onDoubleTap ?? widget.onToggleFullscreen,
+          onVerticalDragStart:
+              widget.onVerticalSwipe == null ? null : (_) => _dragAccum = 0,
+          onVerticalDragUpdate: widget.onVerticalSwipe == null
+              ? null
+              : (DragUpdateDetails d) {
+                  _dragAccum += d.delta.dy;
+                  const double step = 48;
+                  if (_dragAccum <= -step) {
+                    _dragAccum = 0;
+                    widget.onVerticalSwipe!(-1);
+                  } else if (_dragAccum >= step) {
+                    _dragAccum = 0;
+                    widget.onVerticalSwipe!(1);
+                  }
+                },
+          child: ColoredBox(
           color: Colors.black,
           child: Stack(
             fit: StackFit.expand,
@@ -125,6 +166,7 @@ class _PlayerSurfaceState extends ConsumerState<PlayerSurface> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

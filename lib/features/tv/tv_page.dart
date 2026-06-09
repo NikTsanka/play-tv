@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,7 +31,6 @@ class _TvPageState extends ConsumerState<TvPage> {
   bool _panelCollapsed = false;
   bool _osdVisible = false;
   Timer? _osdTimer;
-  double _dragAccum = 0;
   final FocusNode _focus = FocusNode(debugLabel: 'tv-zapping');
 
   @override
@@ -81,7 +79,12 @@ class _TvPageState extends ConsumerState<TvPage> {
     }
     if (key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter) {
-      zap.commitNumber();
+      // Commit a pending channel number; otherwise toggle the channel list.
+      if (ref.read(zappingProvider).numberEntry.isNotEmpty) {
+        zap.commitNumber();
+      } else {
+        setState(() => _panelCollapsed = !_panelCollapsed);
+      }
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.backspace) {
@@ -145,30 +148,18 @@ class _TvPageState extends ConsumerState<TvPage> {
     }
   }
 
-  void _enterFullscreen() {
-    Navigator.of(context).push(
-      PageRouteBuilder<void>(
-        pageBuilder: (context, _, __) => Scaffold(
-          backgroundColor: Colors.black,
-          body: PlayerSurface(
-            isFullscreen: true,
-            onToggleFullscreen: () => Navigator.of(context).maybePop(),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final channels = ref.watch(currentChannelsProvider).valueOrNull;
     final zap = ref.watch(zappingProvider);
+    final bool fullscreen = ref.watch(fullscreenProvider);
 
-    // Reclaim keyboard focus after a fullscreen toggle (the window re-activates,
-    // so the zapping key handler must grab focus again).
+    // Entering fullscreen hides the channel list (clean view); leaving restores
+    // it. Either way, reclaim keyboard focus for the zapping handler.
     ref.listen<bool>(fullscreenProvider, (prev, next) {
+      setState(() => _panelCollapsed = next);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _focus.requestFocus();
       });
@@ -189,7 +180,8 @@ class _TvPageState extends ConsumerState<TvPage> {
       autofocus: true,
       onKeyEvent: _onKey,
       child: Scaffold(
-        appBar: AppBar(
+        // Hidden in fullscreen for a clean, banner-free view.
+        appBar: fullscreen ? null : AppBar(
           title: Text(l10n.navTv),
           leading: IconButton(
             tooltip: l10n.tvTogglePanel,
@@ -241,43 +233,29 @@ class _TvPageState extends ConsumerState<TvPage> {
                   color: scheme.outlineVariant.withValues(alpha: 0.4)),
             Expanded(
               child: hasChannels || zap.current != null
-                  ? Listener(
-                      // Any click in the video area reclaims keyboard focus so
-                      // arrow zapping keeps working (e.g. after fullscreen).
-                      onPointerDown: (_) => _focus.requestFocus(),
-                      // Mouse wheel up / down → volume up / down.
-                      onPointerSignal: (PointerSignalEvent signal) {
-                        if (signal is PointerScrollEvent) {
-                          _changeVolume(signal.scrollDelta.dy < 0 ? 5 : -5);
-                        }
-                      },
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        // Distance-based vertical drag → switch channels (works
-                        // for slow drags, not just flicks). Up = next, down = prev.
-                        onVerticalDragStart: (_) => _dragAccum = 0,
-                        onVerticalDragUpdate: (DragUpdateDetails d) {
-                          _dragAccum += d.delta.dy;
-                          const double step = 48;
+                  // Controls must not grab keyboard focus, or the volume slider
+                  // would eat the arrow keys (esp. after fullscreen).
+                  ? ExcludeFocus(
+                      child: _VideoArea(
+                        current: zap.current,
+                        numberEntry: zap.numberEntry,
+                        osdVisible: _osdVisible,
+                        isFullscreen: fullscreen,
+                        onFullscreen: () =>
+                            ref.read(fullscreenProvider.notifier).toggle(),
+                        // Double-click shows / hides the channel list.
+                        onDoubleTap: () =>
+                            setState(() => _panelCollapsed = !_panelCollapsed),
+                        onActivate: _focus.requestFocus,
+                        onVerticalSwipe: (int dir) {
                           final zapper = ref.read(zappingProvider.notifier);
-                          if (_dragAccum <= -step) {
-                            _dragAccum = 0;
+                          if (dir < 0) {
                             zapper.next();
-                          } else if (_dragAccum >= step) {
-                            _dragAccum = 0;
+                          } else {
                             zapper.previousChannel();
                           }
                         },
-                        // Controls must not grab keyboard focus, or the volume
-                        // slider would eat the arrow keys (esp. after fullscreen).
-                        child: ExcludeFocus(
-                          child: _VideoArea(
-                            current: zap.current,
-                            numberEntry: zap.numberEntry,
-                            osdVisible: _osdVisible,
-                            onFullscreen: _enterFullscreen,
-                          ),
-                        ),
+                        onScrollVolume: _changeVolume,
                       ),
                     )
                   : _EmptyState(onImport: _import),
@@ -294,13 +272,23 @@ class _VideoArea extends StatelessWidget {
     required this.current,
     required this.numberEntry,
     required this.osdVisible,
+    required this.isFullscreen,
     required this.onFullscreen,
+    required this.onDoubleTap,
+    required this.onActivate,
+    required this.onVerticalSwipe,
+    required this.onScrollVolume,
   });
 
   final Channel? current;
   final String numberEntry;
   final bool osdVisible;
+  final bool isFullscreen;
   final VoidCallback onFullscreen;
+  final VoidCallback onDoubleTap;
+  final VoidCallback onActivate;
+  final void Function(int direction) onVerticalSwipe;
+  final void Function(double delta) onScrollVolume;
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +299,14 @@ class _VideoArea extends StatelessWidget {
         fit: StackFit.expand,
         children: <Widget>[
           if (current != null)
-            PlayerSurface(isFullscreen: false, onToggleFullscreen: onFullscreen)
+            PlayerSurface(
+              isFullscreen: isFullscreen,
+              onToggleFullscreen: onFullscreen,
+              onDoubleTap: onDoubleTap,
+              onActivate: onActivate,
+              onVerticalSwipe: onVerticalSwipe,
+              onScrollVolume: onScrollVolume,
+            )
           else
             Center(
               child: Text(l10n.tvSelectChannel,
