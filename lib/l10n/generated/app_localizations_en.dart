@@ -163,6 +163,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get channelsUngrouped => 'Ungrouped';
 
   @override
+  String get channelsAllChannels => 'All Channels';
+
+  @override
   String get channelsCountSuffix => 'channels';
 
   @override

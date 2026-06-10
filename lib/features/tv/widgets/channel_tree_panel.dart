@@ -94,6 +94,19 @@ class _ChannelTreePanelState extends ConsumerState<ChannelTreePanel> {
     final bool searching = _query.trim().isNotEmpty;
     final rows = <_Row>[];
 
+    // An "All Channels" pseudo-group at the very top: every channel in one flat
+    // list, zappable as a single category. Never force-expanded while searching
+    // (it would duplicate every match already shown under its real group).
+    if (filtered.isNotEmpty) {
+      final bool open = _expanded.contains(l10n.channelsAllChannels);
+      rows.add(_Row.group(l10n.channelsAllChannels, filtered.length, open));
+      if (open) {
+        for (final c in filtered) {
+          rows.add(_Row.channel(c, filtered));
+        }
+      }
+    }
+
     // A "Favorites" pseudo-group at the top (current source's favorites).
     final List<Channel> favChannels =
         filtered.where(isFav).toList();

@@ -59,6 +59,7 @@
   "channelsSearch": "Search channels",
   "channelsEmpty": "No channels yet — import a playlist",
   "channelsUngrouped": "Ungrouped",
+  "channelsAllChannels": "All Channels",
   "channelsCountSuffix": "channels",
   "channelsImportTitle": "Import playlist",
   "channelsImportName": "Name",

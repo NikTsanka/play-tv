@@ -3,5 +3,5 @@
 abstract final class AppInfo {
   const AppInfo._();
   static const String appName = 'StreamHub';
-  static const String appVersion = '0.1.0';
+  static const String appVersion = '0.1.1';
 }

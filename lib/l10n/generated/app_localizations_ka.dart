@@ -163,6 +163,9 @@ class AppLocalizationsKa extends AppLocalizations {
   String get channelsUngrouped => 'დაუჯგუფებელი';
 
   @override
+  String get channelsAllChannels => 'ყველა არხი';
+
+  @override
   String get channelsCountSuffix => 'არხი';
 
   @override

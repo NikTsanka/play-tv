@@ -47,6 +47,9 @@ app.*.map.json
 # Inno Setup compiled installer output
 /installer/Output/
 
+# Staged release artifacts (exe/apk/zip — built, not source)
+/release/
+
 # Android Gradle build output + local build logs
 /android/build/
 build_apk*.log

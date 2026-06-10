@@ -35,6 +35,7 @@ class TvPage extends ConsumerStatefulWidget {
 class _TvPageState extends ConsumerState<TvPage> {
   bool _panelCollapsed = false;
   bool _osdVisible = false;
+  bool _resumeAttempted = false;
   Timer? _osdTimer;
   final FocusNode _focus = FocusNode(debugLabel: 'tv-zapping');
 
@@ -182,6 +183,15 @@ class _TvPageState extends ConsumerState<TvPage> {
     });
 
     final bool hasChannels = channels != null && channels.isNotEmpty;
+
+    // Once channels are loaded and nothing is tuned yet, resume the channel that
+    // was playing when the app last closed (runs at most once per page mount).
+    if (!_resumeAttempted && hasChannels && zap.current == null) {
+      _resumeAttempted = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.read(zappingProvider.notifier).resumeLast();
+      });
+    }
 
     return Focus(
       focusNode: _focus,

@@ -400,6 +400,12 @@ abstract class AppLocalizations {
   /// **'Ungrouped'**
   String get channelsUngrouped;
 
+  /// No description provided for @channelsAllChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'All Channels'**
+  String get channelsAllChannels;
+
   /// No description provided for @channelsCountSuffix.
   ///
   /// In en, this message translates to:

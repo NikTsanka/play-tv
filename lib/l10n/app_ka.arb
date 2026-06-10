@@ -57,6 +57,7 @@
   "channelsSearch": "არხების ძებნა",
   "channelsEmpty": "არხები ჯერ არ არის — დაამატეთ ფლეილისტი",
   "channelsUngrouped": "დაუჯგუფებელი",
+  "channelsAllChannels": "ყველა არხი",
   "channelsCountSuffix": "არხი",
   "channelsImportTitle": "ფლეილისტის იმპორტი",
   "channelsImportName": "სახელი",

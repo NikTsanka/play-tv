@@ -1,7 +1,7 @@
 name: streamhub
 description: "StreamHub — universal IPTV / TV / Radio player (Flutter)."
 publish_to: "none"
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -105,6 +105,6 @@ msix_config:
   display_name: StreamHub
   publisher_display_name: StreamHub
   identity_name: com.streamhub.app
-  msix_version: 0.1.0.0
+  msix_version: 0.1.1.0
   capabilities: internetClient
   install_certificate: false

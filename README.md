@@ -66,7 +66,7 @@ the language picker.
   flutter build windows --release
   ISCC.exe installer\streamhub.iss
   ```
-  Produces `installer/Output/StreamHub-Setup-0.1.0.exe` — a per-user installer (no admin),
+  Produces `installer/Output/StreamHub-Setup-0.1.1.exe` — a per-user installer (no admin),
   with Start-menu/desktop shortcuts and an uninstaller.
 - **Windows (MSIX):** config lives under `msix_config:` in `pubspec.yaml`. Build with
   `dart run msix:create` (supply a signing certificate for store/sideload distribution).

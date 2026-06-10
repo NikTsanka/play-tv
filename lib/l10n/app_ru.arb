@@ -57,6 +57,7 @@
   "channelsSearch": "Поиск каналов",
   "channelsEmpty": "Каналов пока нет — импортируйте плейлист",
   "channelsUngrouped": "Без группы",
+  "channelsAllChannels": "Все каналы",
   "channelsCountSuffix": "каналов",
   "channelsImportTitle": "Импорт плейлиста",
   "channelsImportName": "Название",

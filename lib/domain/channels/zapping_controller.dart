@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/logging/app_logger.dart';
+import '../../core/storage/preferences.dart';
 import '../playback/playback_providers.dart';
 import '../playback/playback_status.dart';
 import '../providers/stream_resolver.dart';
@@ -55,6 +56,10 @@ class ZappingController extends Notifier<ZapState> {
       numberEntry: '',
     );
 
+    // Remember the tuned channel so the app can resume it on next launch.
+    ref.read(sharedPreferencesProvider)
+        .setString(PrefKeys.lastChannelId, channel.id);
+
     // Session-based sources (Stalker/OTT) mint a fresh URL per zap; static
     // sources resolve to null and we play the channel's own URL.
     String url = channel.url;
@@ -92,6 +97,23 @@ class ZappingController extends Notifier<ZapState> {
   Future<void> lastChannel() async {
     final prev = state.previous;
     if (prev != null) await play(prev);
+  }
+
+  /// On startup, re-tunes the channel that was playing when the app last closed
+  /// (persisted in [PrefKeys.lastChannelId]). No-op if something is already
+  /// tuned, no channel was stored, or the stored channel is no longer present.
+  Future<void> resumeLast() async {
+    if (state.current != null) return;
+    final String? id =
+        ref.read(sharedPreferencesProvider).getString(PrefKeys.lastChannelId);
+    if (id == null || id.isEmpty) return;
+    final list = _channels;
+    final Channel? match = list.firstWhereOrNull((c) => c.id == id);
+    if (match == null) return;
+    await play(
+      match,
+      scope: list.where((c) => c.group == match.group).toList(),
+    );
   }
 
   void enterDigit(String digit) {

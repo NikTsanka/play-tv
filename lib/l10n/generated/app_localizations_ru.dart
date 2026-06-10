@@ -163,6 +163,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get channelsUngrouped => 'Без группы';
 
   @override
+  String get channelsAllChannels => 'Все каналы';
+
+  @override
   String get channelsCountSuffix => 'каналов';
 
   @override

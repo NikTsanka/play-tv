@@ -17,6 +17,7 @@ abstract final class PrefKeys {
   static const String themeMode = 'app.themeMode';
   static const String locale = 'app.locale';
   static const String currentPlaylist = 'channels.currentPlaylist';
+  static const String lastChannelId = 'channels.lastChannelId';
   static const String currentVodSource = 'vod.currentSource';
   static const String recordingTemplate = 'recording.filenameTemplate';
   static const String parentalPinHash = 'parental.pinHash';
