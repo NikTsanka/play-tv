@@ -96,21 +96,25 @@ class MediaKitEngine implements PlaybackEngine {
 
   void _recompute() {
     final PlaybackState next;
-    if (_status.hasError) {
-      next = PlaybackState.error;
-    } else if (_completed) {
+    if (_completed) {
       next = PlaybackState.ended;
     } else if (_buffering) {
       next = PlaybackState.buffering;
     } else if (_playing) {
       next = PlaybackState.playing;
     } else if (_status.state == PlaybackState.idle ||
-        _status.state == PlaybackState.opening) {
+        _status.state == PlaybackState.opening ||
+        _status.state == PlaybackState.error) {
       next = _status.state;
     } else {
       next = PlaybackState.paused;
     }
-    _emit(_status.copyWith(state: next));
+    // Clear error message when playback recovers.
+    if (_status.hasError && next != PlaybackState.error) {
+      _emit(_status.copyWith(state: next, error: null));
+    } else {
+      _emit(_status.copyWith(state: next));
+    }
   }
 
   void _emit(PlaybackStatus next) {
